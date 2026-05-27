@@ -264,6 +264,7 @@
     </div>
     <div class="topbar-right">
       <span id="ts">—</span><br>
+      <span id="apiKeyStatus" style="cursor:pointer;font-size:11px" onclick="promptApiKey()">❌ 请设置Key</span><br>
       数据源：<a href="https://tophub.today" target="_blank">今日热榜</a> · <a href="https://trends24.in" target="_blank">Twitter趋势</a> · <a href="https://reddit.com/r/popular" target="_blank">Reddit</a>
     </div>
   </div>
@@ -376,6 +377,7 @@ const PLATFORMS = ['微博','知乎','百度','B站','抖音','小红书','Twitt
 let activePlatforms = new Set(PLATFORMS);
 let activeFilter = 'all';
 let currentResults = null;
+let apiKey = localStorage.getItem('hotpulse_apikey') || '';
 
 // ── Init ──
 document.getElementById('ts').textContent = new Date().toLocaleString('zh-CN', {
@@ -384,6 +386,15 @@ document.getElementById('ts').textContent = new Date().toLocaleString('zh-CN', {
 });
 initPills();
 loadHistoryFromStorage();
+updateApiKeyDisplay();
+
+function updateApiKeyDisplay() {
+  const disp = document.getElementById('apiKeyStatus');
+  if (disp) {
+    disp.textContent = apiKey ? '✓ Key已设置' : '❌ 请设置Key';
+    disp.style.color = apiKey ? 'var(--accent)' : 'var(--accent2)';
+  }
+}
 
 function initPills() {
   const el = document.getElementById('pills');
@@ -465,14 +476,20 @@ ${raw}
 评分标准（满分100）：传播潜力40% + 选题新颖度30% + 目标受众广度30%
 按score从高到低排列，最多返回20条，忽略明显低质量或纯广告内容。`;
 
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      // 检查 API Key
+    if (!apiKey) {
+      alert('请先在右上角设置页填写 Anthropic API Key');
+      btn.disabled = false;
+      btn.textContent = '✦ AI 分析';
+      return;
+    }
+
+    const res = await fetch('/api/analyze', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        messages: [{ role: 'user', content: prompt }]
+        prompt: prompt,
+        apiKey: apiKey
       })
     });
 
@@ -584,6 +601,18 @@ function renderResults(data, filter) {
 function setFilter(f) {
   activeFilter = f;
   if (currentResults) renderResults(currentResults, f);
+}
+
+// ── API Key ──
+function promptApiKey() {
+  const key = prompt('请输入您的 Anthropic API Key (sk-ant-...):', apiKey);
+  if (key && key.startsWith('sk-ant-')) {
+    apiKey = key;
+    localStorage.setItem('hotpulse_apikey', key);
+    updateApiKeyDisplay();
+  } else if (key) {
+    alert('Key 格式不正确，应以 sk-ant- 开头');
+  }
 }
 
 // ── Storage ──
