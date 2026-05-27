@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HOTPULSE · 全网热点聚合 AI分析</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --surface2: #1c1c26;
+    --border: rgba(255,255,255,0.07);
+    --accent: #7c6aff;
+    --accent2: #ff6a6a;
+    --accent3: #6affb8;
+    --text: #f0f0f5;
+    --muted: #6b6b80;
+    --tag-cn: rgba(100,160,255,0.15);
+    --tag-cn-t: #82b4ff;
+    --tag-intl: rgba(255,160,80,0.15);
+    --tag-intl-t: #ffa55a;
+    --tag-tech: rgba(80,220,140,0.15);
+    --tag-tech-t: #50dc8c;
+    --tag-ent: rgba(240,100,200,0.15);
+    --tag-ent-t: #f064c8;
+    --tag-social: rgba(200,200,100,0.15);
+    --tag-social-t: #d4d44a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── Layout ── */
+  .app { max-width: 900px; margin: 0 auto; padding: 0 16px 60px; }
+
+  /* ── Top bar ── */
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 0 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 0;
+  }
+  .logo {
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 22px;
+    letter-spacing: -0.03em;
+  }
+  .logo span.accent { color: var(--accent); }
+  .logo-sub { font-size: 12px; font-weight: 400; color: var(--muted); font-family: 'DM Sans', sans-serif; margin-left: 8px; }
+  .topbar-right { font-size: 12px; color: var(--muted); text-align: right; line-height: 1.5; }
+  .topbar-right a { color: var(--accent); text-decoration: none; }
+  .topbar-right a:hover { text-decoration: underline; }
+
+  /* ── Tabs ── */
+  .tabs { display: flex; gap: 2px; padding-top: 16px; border-bottom: 1px solid var(--border); }
+  .tab-btn {
+    font-family: 'DM Sans', sans-serif; font-size: 13px;
+    padding: 9px 18px; border-radius: 8px 8px 0 0;
+    border: none; cursor: pointer; transition: all .2s;
+    color: var(--muted); background: transparent;
+  }
+  .tab-btn.active { background: var(--surface2); color: var(--text); }
+  .tab-btn:hover:not(.active) { color: var(--text); }
+
+  /* ── Panel ── */
+  .panel { display: none; padding-top: 24px; }
+  .panel.active { display: block; }
+
+  /* ── Input section ── */
+  .section-label {
+    font-size: 11px; color: var(--muted); letter-spacing: .07em;
+    text-transform: uppercase; margin-bottom: 10px;
+  }
+  .platform-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
+  .pill {
+    font-size: 12px; padding: 5px 12px; border-radius: 20px;
+    border: 1px solid var(--border); cursor: pointer; transition: all .2s;
+    color: var(--muted); background: transparent;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .pill.on { border-color: var(--accent); color: var(--accent); background: rgba(124,106,255,0.12); }
+
+  .input-row { display: flex; gap: 10px; align-items: flex-start; }
+  textarea {
+    flex: 1; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; color: var(--text);
+    font-family: 'DM Sans', sans-serif; font-size: 13px;
+    padding: 14px 16px; resize: vertical; min-height: 140px;
+    outline: none; transition: border .2s; line-height: 1.7;
+  }
+  textarea:focus { border-color: rgba(124,106,255,0.5); }
+  textarea::placeholder { color: var(--muted); }
+
+  .btn-col { display: flex; flex-direction: column; gap: 8px; }
+  .run-btn {
+    background: var(--accent); color: #fff; border: none; border-radius: 10px;
+    padding: 0 20px; height: 48px;
+    font-family: 'Syne', sans-serif; font-weight: 600; font-size: 14px;
+    cursor: pointer; white-space: nowrap; transition: all .2s;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .run-btn:hover { background: #9080ff; transform: translateY(-1px); }
+  .run-btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+  .clear-btn {
+    background: transparent; color: var(--muted); border: 1px solid var(--border);
+    border-radius: 10px; padding: 0 16px; height: 36px;
+    font-family: 'DM Sans', sans-serif; font-size: 12px;
+    cursor: pointer; transition: all .2s;
+  }
+  .clear-btn:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+
+  /* ── Results ── */
+  .results-area { margin-top: 28px; }
+  .results-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .results-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; }
+  .filter-row { display: flex; gap: 6px; }
+  .filter-btn {
+    font-size: 12px; padding: 4px 12px; border-radius: 6px;
+    border: 1px solid var(--border); cursor: pointer;
+    color: var(--muted); background: transparent;
+    font-family: 'DM Sans', sans-serif; transition: all .18s;
+  }
+  .filter-btn.on { background: rgba(255,255,255,0.07); color: var(--text); border-color: rgba(255,255,255,0.18); }
+
+  .summary-bar {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 13px 16px;
+    margin-bottom: 16px; font-size: 13px; line-height: 1.7;
+  }
+  .summary-bar strong { color: var(--accent); }
+
+  .topic-list { display: flex; flex-direction: column; gap: 10px; }
+  .topic-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 16px 18px;
+    transition: border-color .2s, transform .15s;
+  }
+  .topic-card:hover { border-color: rgba(255,255,255,0.14); transform: translateY(-1px); }
+  .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .card-left { display: flex; align-items: flex-start; gap: 14px; flex: 1; }
+  .rank-num {
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 20px;
+    color: var(--muted); min-width: 32px; padding-top: 1px; line-height: 1;
+  }
+  .rank-num.top { color: var(--accent); }
+  .topic-text { font-size: 15px; line-height: 1.5; }
+  .card-score { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; min-width: 52px; }
+  .score-val { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 24px; line-height: 1; }
+  .score-label { font-size: 10px; color: var(--muted); }
+  .score-bar { height: 3px; border-radius: 2px; background: var(--border); overflow: hidden; width: 52px; margin-top: 2px; }
+  .score-fill { height: 100%; border-radius: 2px; background: var(--accent); }
+
+  .card-meta { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .tag { font-size: 11px; padding: 3px 9px; border-radius: 5px; }
+  .tag.cn { background: var(--tag-cn); color: var(--tag-cn-t); }
+  .tag.intl { background: var(--tag-intl); color: var(--tag-intl-t); }
+  .tag.tech { background: var(--tag-tech); color: var(--tag-tech-t); }
+  .tag.ent { background: var(--tag-ent); color: var(--tag-ent-t); }
+  .tag.social { background: var(--tag-social); color: var(--tag-social-t); }
+  .tag.src { background: rgba(255,255,255,0.05); color: var(--muted); }
+
+  .insight {
+    margin-top: 10px; font-size: 12px; color: var(--muted);
+    line-height: 1.7; border-left: 2px solid rgba(124,106,255,0.4);
+    padding-left: 12px; font-style: italic;
+  }
+  .angle {
+    margin-top: 8px; font-size: 13px; color: var(--accent3); line-height: 1.6;
+    background: rgba(106,255,184,0.05); border-radius: 8px; padding: 8px 12px;
+  }
+  .angle strong { font-weight: 500; color: rgba(106,255,184,0.7); }
+
+  /* ── States ── */
+  .loading-box { text-align: center; padding: 60px 24px; }
+  .spinner {
+    width: 40px; height: 40px; border: 2px solid var(--border);
+    border-top-color: var(--accent); border-radius: 50%;
+    animation: spin .8s linear infinite; margin: 0 auto 20px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-text { color: var(--muted); font-size: 14px; line-height: 1.8; }
+
+  .empty-state { text-align: center; padding: 60px 24px; }
+  .empty-icon { font-size: 40px; margin-bottom: 14px; }
+  .empty-text { color: var(--muted); font-size: 14px; line-height: 1.8; }
+
+  .error-box {
+    background: rgba(255,100,100,0.07); border: 1px solid rgba(255,100,100,0.2);
+    border-radius: 10px; padding: 16px; font-size: 13px; color: #ff8888; line-height: 1.7;
+  }
+
+  .s-high { color: var(--accent3); }
+  .s-mid  { color: var(--accent); }
+  .s-low  { color: var(--muted); }
+
+  /* ── History ── */
+  .hist-empty { text-align: center; padding: 48px; color: var(--muted); font-size: 13px; line-height: 1.8; }
+  .hist-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px 18px; margin-bottom: 10px;
+    cursor: pointer; transition: border-color .2s, transform .15s;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .hist-card:hover { border-color: rgba(255,255,255,0.15); transform: translateY(-1px); }
+  .hist-date { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+  .hist-preview { font-size: 13px; }
+  .hist-count { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 22px; color: var(--accent); min-width: 40px; text-align: center; }
+  .hist-count-label { font-size: 10px; color: var(--muted); text-align: center; }
+
+  /* ── Guide ── */
+  .guide { max-width: 620px; }
+  .guide-step {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 20px 22px; margin-bottom: 12px;
+  }
+  .guide-step-num {
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 11px;
+    color: var(--accent); letter-spacing: .1em; margin-bottom: 8px;
+  }
+  .guide-step-title { font-size: 15px; font-weight: 500; margin-bottom: 8px; }
+  .guide-step-body { font-size: 13px; color: var(--muted); line-height: 1.8; }
+  .guide-step-body a { color: var(--accent); text-decoration: none; }
+  .guide-step-body a:hover { text-decoration: underline; }
+  .guide-step-body code {
+    background: rgba(124,106,255,0.12); color: var(--accent);
+    padding: 1px 6px; border-radius: 4px; font-size: 12px;
+  }
+
+  /* ── Footer ── */
+  footer {
+    margin-top: 60px; padding: 20px 0; border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--muted); text-align: center; line-height: 1.8;
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+
+  /* ── Responsive ── */
+  @media (max-width: 600px) {
+    .input-row { flex-direction: column; }
+    .btn-col { flex-direction: row; flex-wrap: wrap; }
+    .run-btn { flex: 1; justify-content: center; }
+    .card-top { flex-direction: column; }
+    .card-score { flex-direction: row; align-items: center; gap: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- Top bar -->
+  <div class="topbar">
+    <div>
+      <span class="logo">HOT<span class="accent">PULSE</span><span class="logo-sub">全网热点聚合 · AI分析版</span></span>
+    </div>
+    <div class="topbar-right">
+      <span id="ts">—</span><br>
+      数据源：<a href="https://tophub.today" target="_blank">今日热榜</a> · <a href="https://trends24.in" target="_blank">Twitter趋势</a> · <a href="https://reddit.com/r/popular" target="_blank">Reddit</a>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('analyze', this)">🔍 热点分析</button>
+    <button class="tab-btn" onclick="switchTab('history', this)">📁 历史记录</button>
+    <button class="tab-btn" onclick="switchTab('guide', this)">📖 使用指南</button>
+  </div>
+
+  <!-- ── Analyze Panel ── -->
+  <div class="panel active" id="panel-analyze">
+
+    <div class="section-label">① 选择平台来源（点击取消/添加）</div>
+    <div class="platform-pills" id="pills"></div>
+
+    <div class="section-label">② 粘贴热榜内容 — 支持任意格式，AI 自动解析</div>
+    <div class="input-row">
+      <textarea id="rawInput" placeholder="把各平台热榜内容粘贴到这里，例如：
+
+【微博热搜】1. 山西煤矿爆炸82人遇难 2. 盒马郑重道歉 3. 抖音禁止录播伪装直播...
+【知乎热榜】1. 山西煤矿事故 1325万热度  2. 腾讯放弃音频独家版权...
+【Twitter Trends】1. Memorial Day  2. Iran deal  3. Gaza ceasefire...
+【Reddit r/worldnews】US attacks Iran missile sites in self-defense...
+【B站热门】1. 原神新版本 2. 英伟达量子AI...
+
+不需要整理格式，直接粘贴即可。"></textarea>
+      <div class="btn-col">
+        <button class="run-btn" id="runBtn" onclick="runAnalysis()">
+          ✦ AI 分析
+        </button>
+        <button class="clear-btn" onclick="clearInput()">清空</button>
+      </div>
+    </div>
+
+    <div class="results-area" id="resultsArea">
+      <div class="empty-state">
+        <div class="empty-icon">⚡</div>
+        <div class="empty-text">
+          粘贴各平台热榜内容，点击「AI 分析」<br>
+          自动完成 <strong>去重 · 分类 · 选题评分 · 内容角度建议</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── History Panel ── -->
+  <div class="panel" id="panel-history">
+    <div id="historyArea">
+      <div class="hist-empty">暂无历史记录<br><span style="font-size:12px">每次分析完成后自动保存（本地 localStorage）</span></div>
+    </div>
+  </div>
+
+  <!-- ── Guide Panel ── -->
+  <div class="panel" id="panel-guide">
+    <div class="guide">
+      <div class="guide-step">
+        <div class="guide-step-num">STEP 01</div>
+        <div class="guide-step-title">收集热榜数据</div>
+        <div class="guide-step-body">
+          推荐数据源：<br>
+          · 国内综合：<a href="https://tophub.today" target="_blank">今日热榜 tophub.today</a>（微博/知乎/百度/B站/抖音/小红书全有）<br>
+          · Twitter/X 实时趋势：<a href="https://trends24.in/china/" target="_blank">trends24.in</a><br>
+          · Reddit 全球热帖：<a href="https://reddit.com/r/popular" target="_blank">reddit.com/r/popular</a><br>
+          · YouTube 热门：<a href="https://youtube.com/feed/trending" target="_blank">youtube.com/feed/trending</a>
+        </div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-step-num">STEP 02</div>
+        <div class="guide-step-title">粘贴内容 · 无需整理格式</div>
+        <div class="guide-step-body">
+          把各平台热榜直接复制粘贴进输入框，可以混在一起，AI 会自动识别来源和话题。<br>
+          建议用 <code>【平台名】</code> 标注区分，但不是必须的。
+        </div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-step-num">STEP 03</div>
+        <div class="guide-step-title">读懂分析结果</div>
+        <div class="guide-step-body">
+          每条热点包含：<br>
+          · <strong>选题分 0-100</strong>：传播潜力 × 新颖度 × 受众广度<br>
+          · <strong>平台分布</strong>：哪些平台同时在热<br>
+          · <strong>话题分类</strong>：社会 / 科技 / 娱乐 / 国际 / 财经<br>
+          · <strong>内容角度建议</strong>：具体可以从哪个切入点创作<br>
+          · <strong>国内/国际</strong>标签：快速筛选受众方向
+        </div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-step-num">STEP 04</div>
+        <div class="guide-step-title">历史记录</div>
+        <div class="guide-step-body">
+          每次分析结果自动保存到本地，最多保留 20 条。<br>
+          切换到「历史记录」标签可回溯往期热点，点击任意记录可重新加载。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    HOTPULSE · 全网热点聚合 AI 分析工具 · Powered by Claude API<br>
+    数据来源：<a href="https://tophub.today" target="_blank">今日热榜</a> · <a href="https://trends24.in" target="_blank">Trends24</a> · <a href="https://reddit.com" target="_blank">Reddit</a> · 各平台公开热榜
+  </footer>
+
+</div>
+
+<script>
+// ── State ──
+const PLATFORMS = ['微博','知乎','百度','B站','抖音','小红书','Twitter/X','Reddit','YouTube'];
+let activePlatforms = new Set(PLATFORMS);
+let activeFilter = 'all';
+let currentResults = null;
+
+// ── Init ──
+document.getElementById('ts').textContent = new Date().toLocaleString('zh-CN', {
+  year:'numeric', month:'numeric', day:'numeric',
+  hour:'2-digit', minute:'2-digit'
+});
+initPills();
+loadHistoryFromStorage();
+
+function initPills() {
+  const el = document.getElementById('pills');
+  PLATFORMS.forEach(p => {
+    const b = document.createElement('button');
+    b.className = 'pill on';
+    b.textContent = p;
+    b.onclick = () => {
+      if (activePlatforms.has(p)) activePlatforms.delete(p);
+      else activePlatforms.add(p);
+      b.className = 'pill' + (activePlatforms.has(p) ? ' on' : '');
+    };
+    el.appendChild(b);
+  });
+}
+
+// ── Tab switching ──
+function switchTab(t, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + t).classList.add('active');
+  btn.classList.add('active');
+  if (t === 'history') renderHistory();
+}
+
+// ── Clear ──
+function clearInput() {
+  document.getElementById('rawInput').value = '';
+  document.getElementById('resultsArea').innerHTML = `
+    <div class="empty-state">
+      <div class="empty-icon">⚡</div>
+      <div class="empty-text">粘贴各平台热榜内容，点击「AI 分析」<br>自动完成 <strong>去重 · 分类 · 选题评分 · 内容角度建议</strong></div>
+    </div>`;
+}
+
+// ── Main analysis ──
+async function runAnalysis() {
+  const raw = document.getElementById('rawInput').value.trim();
+  if (!raw) { alert('请先粘贴热榜内容'); return; }
+
+  const btn = document.getElementById('runBtn');
+  btn.disabled = true;
+  btn.textContent = '分析中…';
+
+  const area = document.getElementById('resultsArea');
+  area.innerHTML = `<div class="loading-box"><div class="spinner"></div><div class="loading-text">AI 正在聚合分析热点<br>识别话题 · 去重合并 · 评分排序<br>约需 15-30 秒…</div></div>`;
+
+  const platforms = Array.from(activePlatforms).join('、');
+
+  const prompt = `你是一个专业的内容平台热点分析师，服务于做内容运营的团队。
+
+当前选择的数据平台：${platforms}
+原始热榜数据：
+${raw}
+
+请执行：
+1. 从原始内容中识别并提取所有热点话题
+2. 合并同一事件在不同平台的重复话题
+3. 分析每个热点的内容创作价值
+
+严格返回JSON格式（不输出任何其他文字）：
+{
+  "summary": "今日热点一句话总结（40字以内）",
+  "topics": [
+    {
+      "rank": 1,
+      "title": "话题标题（25字以内，准确简洁）",
+      "score": 88,
+      "category": "社会/科技/娱乐/国际/财经/生活/体育",
+      "region": "cn/intl/both",
+      "platforms": ["微博", "知乎"],
+      "insight": "这个话题的核心爆点或值得关注的原因（35字以内）",
+      "angle": "适合内容创作者的具体切入角度和选题建议（45字以内）",
+      "heat": "高/中/低"
+    }
+  ]
+}
+
+评分标准（满分100）：传播潜力40% + 选题新颖度30% + 目标受众广度30%
+按score从高到低排列，最多返回20条，忽略明显低质量或纯广告内容。`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    if (!res.ok) throw new Error(`API错误 ${res.status}`);
+
+    const data = await res.json();
+    const text = data.content.map(i => i.text || '').join('');
+    const clean = text.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(clean);
+
+    currentResults = parsed;
+    renderResults(parsed);
+    saveToStorage(parsed, raw);
+
+  } catch (e) {
+    area.innerHTML = `<div class="error-box">
+      ⚠️ 分析出错：${e.message}<br><br>
+      可能原因：<br>
+      · 网络连接问题，请刷新重试<br>
+      · 粘贴内容过长，请减少内容后重试<br>
+      · API 临时故障，稍后再试
+    </div>`;
+  }
+
+  btn.disabled = false;
+  btn.textContent = '✦ AI 分析';
+}
+
+// ── Render results ──
+function scoreColor(s) {
+  if (s >= 75) return 's-high';
+  if (s >= 50) return 's-mid';
+  return 's-low';
+}
+
+function regionTag(r) {
+  if (r === 'cn')   return '<span class="tag cn">🇨🇳 国内</span>';
+  if (r === 'intl') return '<span class="tag intl">🌍 国际</span>';
+  return '<span class="tag cn">🇨🇳 国内</span><span class="tag intl">🌍 国际</span>';
+}
+
+function catTag(c) {
+  const map = { 社会:'social', 科技:'tech', 娱乐:'ent', 国际:'intl', 财经:'social', 生活:'social', 体育:'ent' };
+  return `<span class="tag ${map[c]||'src'}">${c}</span>`;
+}
+
+function renderResults(data, filter) {
+  filter = filter || activeFilter;
+  const area = document.getElementById('resultsArea');
+  const topics = (data.topics || []).filter(t => {
+    if (filter === 'cn')   return t.region === 'cn' || t.region === 'both';
+    if (filter === 'intl') return t.region === 'intl' || t.region === 'both';
+    if (filter === 'high') return t.score >= 75;
+    return true;
+  });
+
+  const totalCount = (data.topics || []).length;
+
+  let html = `
+  <div class="results-header">
+    <div class="results-title">共识别 ${totalCount} 条热点${filter !== 'all' ? `，当前显示 ${topics.length} 条` : ''}</div>
+    <div class="filter-row">
+      <button class="filter-btn ${filter==='all'?'on':''}" onclick="setFilter('all')">全部</button>
+      <button class="filter-btn ${filter==='cn'?'on':''}" onclick="setFilter('cn')">国内</button>
+      <button class="filter-btn ${filter==='intl'?'on':''}" onclick="setFilter('intl')">国际</button>
+      <button class="filter-btn ${filter==='high'?'on':''}" onclick="setFilter('high')">高分 ≥75</button>
+    </div>
+  </div>`;
+
+  if (data.summary) {
+    html += `<div class="summary-bar">📡 <strong>今日热点速览：</strong>${data.summary}</div>`;
+  }
+
+  if (topics.length === 0) {
+    html += `<div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-text">当前筛选条件下没有匹配的热点</div></div>`;
+  } else {
+    html += `<div class="topic-list">`;
+    topics.forEach((t, i) => {
+      const sc = scoreColor(t.score);
+      const plat = (t.platforms || []).map(p => `<span class="tag src">${p}</span>`).join('');
+      html += `
+      <div class="topic-card">
+        <div class="card-top">
+          <div class="card-left">
+            <div class="rank-num ${i < 3 ? 'top' : ''}">${String(t.rank).padStart(2, '0')}</div>
+            <div class="topic-text">${t.title}</div>
+          </div>
+          <div class="card-score">
+            <div class="score-val ${sc}">${t.score}</div>
+            <div class="score-label">选题分</div>
+            <div class="score-bar"><div class="score-fill" style="width:${t.score}%"></div></div>
+          </div>
+        </div>
+        <div class="card-meta">
+          ${regionTag(t.region)}
+          ${catTag(t.category)}
+          ${plat}
+        </div>
+        ${t.insight ? `<div class="insight">${t.insight}</div>` : ''}
+        ${t.angle ? `<div class="angle"><strong>✦ 内容角度：</strong>${t.angle}</div>` : ''}
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  area.innerHTML = html;
+}
+
+function setFilter(f) {
+  activeFilter = f;
+  if (currentResults) renderResults(currentResults, f);
+}
+
+// ── Storage ──
+function saveToStorage(data, raw) {
+  try {
+    const history = getHistory();
+    history.unshift({
+      time: new Date().toLocaleString('zh-CN'),
+      timestamp: Date.now(),
+      summary: data.summary,
+      count: (data.topics || []).length,
+      raw: raw.substring(0, 500),
+      data
+    });
+    if (history.length > 20) history.splice(20);
+    localStorage.setItem('hotpulse_history', JSON.stringify(history));
+  } catch(e) {}
+}
+
+function getHistory() {
+  try {
+    return JSON.parse(localStorage.getItem('hotpulse_history') || '[]');
+  } catch(e) { return []; }
+}
+
+function loadHistoryFromStorage() {}
+
+function renderHistory() {
+  const area = document.getElementById('historyArea');
+  const history = getHistory();
+  if (!history.length) {
+    area.innerHTML = `<div class="hist-empty">暂无历史记录<br><span style="font-size:12px">每次分析完成后自动保存到本地，最多保留20条</span></div>`;
+    return;
+  }
+  area.innerHTML = history.map((h, i) => `
+    <div class="hist-card" onclick="loadHistory(${i})">
+      <div style="text-align:center">
+        <div class="hist-count">${h.count}</div>
+        <div class="hist-count-label">条热点</div>
+      </div>
+      <div style="flex:1">
+        <div class="hist-date">${h.time}</div>
+        <div class="hist-preview">${h.summary || '—'}</div>
+      </div>
+      <div style="font-size:12px;color:var(--muted)">点击加载 →</div>
+    </div>
+  `).join('');
+}
+
+function loadHistory(i) {
+  const h = getHistory()[i];
+  if (!h) return;
+  document.getElementById('rawInput').value = h.raw;
+  currentResults = h.data;
+
+  // Switch to analyze tab
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-analyze').classList.add('active');
+  document.querySelectorAll('.tab-btn')[0].classList.add('active');
+
+  renderResults(h.data, 'all');
+}
+</script>
+</body>
+</html>
