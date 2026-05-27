@@ -237,6 +237,10 @@
   }
 
   /* ── Footer ── */
+  .free-badge {
+    display: inline-block; background: rgba(106,255,184,0.12); color: var(--accent3);
+    padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 500;
+  }
   footer {
     margin-top: 60px; padding: 20px 0; border-top: 1px solid var(--border);
     font-size: 12px; color: var(--muted); text-align: center; line-height: 1.8;
@@ -264,7 +268,7 @@
     </div>
     <div class="topbar-right">
       <span id="ts">—</span><br>
-      <span id="apiKeyStatus" style="cursor:pointer;font-size:11px" onclick="promptApiKey()">❌ 请设置Key</span><br>
+      <span style="color:var(--accent3);font-size:11px">✦ 完全免费 · 无需API</span><br>
       数据源：<a href="https://tophub.today" target="_blank">今日热榜</a> · <a href="https://trends24.in" target="_blank">Twitter趋势</a> · <a href="https://reddit.com/r/popular" target="_blank">Reddit</a>
     </div>
   </div>
@@ -365,7 +369,7 @@
   </div>
 
   <footer>
-    HOTPULSE · 全网热点聚合 AI 分析工具 · Powered by Claude API<br>
+    HOTPULSE · 全网热点聚合分析工具 · <span class="free-badge">完全免费版</span><br>
     数据来源：<a href="https://tophub.today" target="_blank">今日热榜</a> · <a href="https://trends24.in" target="_blank">Trends24</a> · <a href="https://reddit.com" target="_blank">Reddit</a> · 各平台公开热榜
   </footer>
 
@@ -377,7 +381,6 @@ const PLATFORMS = ['微博','知乎','百度','B站','抖音','小红书','Twitt
 let activePlatforms = new Set(PLATFORMS);
 let activeFilter = 'all';
 let currentResults = null;
-let apiKey = localStorage.getItem('hotpulse_apikey') || '';
 
 // ── Init ──
 document.getElementById('ts').textContent = new Date().toLocaleString('zh-CN', {
@@ -386,15 +389,6 @@ document.getElementById('ts').textContent = new Date().toLocaleString('zh-CN', {
 });
 initPills();
 loadHistoryFromStorage();
-updateApiKeyDisplay();
-
-function updateApiKeyDisplay() {
-  const disp = document.getElementById('apiKeyStatus');
-  if (disp) {
-    disp.textContent = apiKey ? '✓ Key已设置' : '❌ 请设置Key';
-    disp.style.color = apiKey ? 'var(--accent)' : 'var(--accent2)';
-  }
-}
 
 function initPills() {
   const el = document.getElementById('pills');
@@ -431,6 +425,152 @@ function clearInput() {
 }
 
 // ── Main analysis ──
+// ── 免费版：本地分析引擎 ──
+const CATEGORY_KEYWORDS = {
+  '社会': ['事故','爆炸','火灾','地震','疫情','死亡','遇难','伤亡','失踪','案件','犯罪','抓捕','判刑','离婚','出轨','家暴','霸凌','校园','教育','高考','中考','就业','失业','房价','社保','医保','养老','退休','工资','涨薪','罢工','抗议','游行','政策','法规','法律','出台','禁令','封控','解封','核酸','疫苗','健康码','口罩','防控','救灾','捐款','慈善','贫困','扶贫','低保','拆迁','征地','维权','上访','信访','举报','曝光','揭露','丑闻','绯闻','八卦','明星','网红','主播','带货','打假','造假','掺假','毒','污染','环境','气候','天气','台风','暴雨','洪涝','干旱','高温','寒潮'],
+  '科技': ['AI','人工智能','GPT','ChatGPT','Claude','大模型','芯片','半导体','英伟达','NVIDIA','苹果','Apple','iPhone','华为','小米','OPPO','vivo','特斯拉','Tesla','SpaceX','马斯克','元宇宙','区块链','比特币','BTC','加密货币','Web3','5G','6G','量子','算力','云计算','开源','APP','算法','推荐系统','自动驾驶','新能源','电池','光伏','卫星','火箭','发射','登月','火星','机器人','脑机接口','VR','AR','MR','折叠屏','智能手表','耳机','电脑','笔记本','显卡','游戏机','PS5','Switch','Steam','游戏','电竞'],
+  '娱乐': ['电影','电视剧','综艺','选秀','偶像','演唱会','音乐','专辑','歌曲','歌手','演员','导演','票房','档期','上映','首映','获奖','提名','奥斯卡','金鸡奖','百花奖','综艺','真人秀','脱口秀','相声','小品','舞蹈','街舞','偶像练习生','创造营','青春有你','浪姐','披荆斩棘','声生不息','歌手','天赐的声音','奔跑吧','极限挑战','向往的生活','中餐厅','亲爱的客栈','花少','旅行','旅游','打卡','美食','探店','吃播','vlog','博主','UP主','种草','测评','开箱','穿搭','美妆','护肤','彩妆','减肥','健身','瑜伽','医美','整容','整形'],
+  '国际': ['美国','中国','俄罗斯','乌克兰','日本','韩国','朝鲜','印度','英国','法国','德国','欧盟','北约','联合国','WHO','WTO','拜登','特朗普','普京','泽连斯基','岸田','尹锡悦','莫迪','马克龙','苏纳克','朔尔茨','战争','冲突','制裁','关税','贸易战','脱钩','峰会','会谈','协议','条约','核武器','导弹','军演','航母','战机','南海','台海','中东','巴以','伊朗','以色列','哈马斯','黎巴嫩','叙利亚','阿富汗','塔利班','选举','总统','首相','议会','公投','独立','政变','革命','示威','罢工','通胀','加息','降息','衰退','央行','美联储','欧央行','日元','汇率','股市','美股','A股','港股','原油','黄金','比特币','ETF'],
+  '财经': ['GDP','CPI','PMI','营收','利润','财报','上市','IPO','融资','创投','估值','独角兽','倒闭','破产','裁员','降薪','年终奖','股票','基金','债券','期货','外汇','人民币','美元','欧元','日元','利率','房贷','车贷','消费贷','信用卡','网贷','P2P','理财','保险','银行','券商','私募','公募','养老金','社保','公积金','税收','退税','补贴','发钱','消费','零售','电商','淘宝','天猫','京东','拼多多','抖音电商','直播带货','双11','618','购物节','促销','打折','优惠','涨价','降价','成本','供应链','物流','快递','外卖','美团','饿了么','滴滴','Uber','网约车','共享单车','共享充电宝'],
+  '生活': ['美食','菜谱','食谱','做饭','家常菜','甜品','饮料','咖啡','奶茶','火锅','烧烤','自助餐','日料','西餐','快餐','肯德基','麦当劳','星巴克','瑞幸','蜜雪冰城','宠物','猫','狗','猫咪','狗狗','养宠','铲屎官','装修','家居','家具','家电','空调','冰箱','洗衣机','电视','扫地机器人','空气净化器','净水器','出行','旅游','机票','酒店','民宿','自驾','高铁','飞机','火车','地铁','公交','打车','租车','买车','考驾照','堵车','停车','违章','年检','加油','充电桩','电动车','摩托车','自行车','露营','徒步','登山','钓鱼','摄影','拍照','手机摄影','剪辑','视频','短视频','直播','网红','博主','UP主','种草','穿搭','时尚','潮流','球鞋','限量','联名','潮牌','奢侈品','GUCCI','LV','爱马仕','香奈儿','DIOR'],
+  '体育': ['世界杯','欧洲杯','欧冠','英超','西甲','意甲','德甲','NBA','CBA','F1','奥运会','亚运会','全运会','中超','中甲','网球','高尔夫','乒乓球','羽毛球','排球','游泳','跳水','田径','马拉松','铁人三项','拳击','UFC','MMA','电竞','LOL','DOTA2','王者荣耀','和平精英','原神','绝地求生','CSGO','瓦罗兰特','战队','俱乐部','转会','签约','退役','冠军','亚军','季军','金牌','银牌','铜牌','纪录','破纪录','MVP','FMVP','最佳射手','最佳球员','教练','裁判','VAR','越位','红牌','黄牌','点球','进球','助攻','帽子戏法']
+};
+
+const HIGH_VALUE_KEYWORDS = ['突发','首次','突破','重磅','官宣','确认','否认','反转','曝光','揭秘','内幕','崩塌','暴跌','暴涨','涨停','跌停','并购','收购','上市','退市','破产','裁员','倒闭','关停','停更','解散','分手','离婚','去世','逝世','牺牲','遇难','夺冠','创纪录','打破历史','里程碑','百亿','千亿','万亿','万亿级','国家级','世界级','全球第一','亚洲第一','全国第一','独家','首发','限免','免费','补贴','发钱','降息','加息','降准','降税','退税','新政','新规','新法','禁令','放开','解封','恢复','重启','延期','取消','永久','终身','无限','全面','全部','所有','每个人','全民','全网','全国','全球','人类'];
+
+function detectCategory(title) {
+  let scores = {};
+  for (const [cat, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
+    let score = 0;
+    for (const kw of keywords) {
+      if (title.includes(kw)) score += 1;
+    }
+    if (score > 0) scores[cat] = score;
+  }
+  if (Object.keys(scores).length === 0) return '社会';
+  return Object.entries(scores).sort((a,b) => b[1] - a[1])[0][0];
+}
+
+function detectRegion(title) {
+  const cnIndicators = ['中国','国内','全国','北京','上海','广州','深圳','杭州','成都','武汉','西安','重庆','南京','天津','苏州','长沙','郑州','东莞','青岛','大连','厦门','宁波','无锡','合肥','佛山','福州','济南','哈尔滨','长春','沈阳','太原','石家庄','南昌','昆明','贵阳','南宁','海口','兰州','银川','西宁','呼和浩特','乌鲁木齐','拉萨','台湾','香港','澳门','央视','人民日报','新华社','光明日报','经济日报','微博热搜','知乎热榜','百度热搜','B站热门','抖音热点','小红书','豆瓣','虎扑','懂球帝'];
+  const intlIndicators = ['US','USA','UK','EU','UN','NATO','WHO','WTO','NASA','FBI','CIA','NSA','White House','Pentagon','Kremlin','Downing Street','Elysee Palace','Biden','Trump','Putin','Zelenskyy','Netanyahu','Starmer','Macron','Scholz','Meloni','Kishida','Yoon','Modi','America','British','European','Russian','Ukrainian','Japanese','Korean','Indian','Middle East','Latin America','Africa','Southeast Asia','Nordic','Scandinavian','Baltic','Caucasus','Caribbean','Pacific','Atlantic','Arctic','Antarctic','Global','Worldwide','International','Twitter','Reddit','Trending','Viral','BBC','CNN','Reuters','AP','AFP','Bloomberg','WSJ','NYT','Washington Post','The Guardian','Al Jazeera','France24','DW','NHK','KBS','ABC','CBS','NBC','Fox News','MSNBC','CNBC','Forbes','Fortune','TechCrunch','The Verge','Wired','Ars Technica','Engadget','Gizmodo','Mashable','BuzzFeed','HuffPost','Vox','Politico','Economist','Financial Times','Nikkei','South China Morning Post',' Straits Times','India Times','Times of Israel','Jerusalem Post','Haaretz','Al Arabiya','Al Jazeera','TRT World','CGTN','RT','Sputnik','TASS','Itar-Tass','Interfax','RIA Novosti','Xinhua','Kyodo','Yonhap','Central News Agency','Anadolu','DPA','APA','CTK','MTI','TASR','BTA','Moldpress','Agerpres','ACTMedia','MLADA','BTA'];
+  let cn = 0, intl = 0;
+  for (const kw of cnIndicators) { if (title.includes(kw)) cn++; }
+  for (const kw of intlIndicators) { if (title.includes(kw)) intl++; }
+  if (cn > 0 && intl > 0) return 'both';
+  if (cn > 0) return 'cn';
+  if (intl > 0) return 'intl';
+  // 默认根据平台判断
+  return 'cn';
+}
+
+function calcScore(topic, rank, platformCount) {
+  let score = 50; // 基础分
+  // 排名加分
+  score += Math.max(0, 15 - rank * 0.5);
+  // 平台覆盖加分
+  score += platformCount * 6;
+  // 高价值关键词加分
+  for (const kw of HIGH_VALUE_KEYWORDS) {
+    if (topic.title.includes(kw)) { score += 4; break; }
+  }
+  // 分类加成
+  const cat = topic.category;
+  if (cat === '科技' || cat === '财经') score += 5;
+  else if (cat === '社会' || cat === '国际') score += 3;
+  // 区域加成
+  if (topic.region === 'both') score += 5;
+  // 热度词加成
+  if (topic.heat === '高') score += 8;
+  else if (topic.heat === '中') score += 4;
+  return Math.min(99, Math.max(25, Math.round(score)));
+}
+
+function generateInsight(title, category) {
+  const insights = {
+    '社会': [`「${title}」引发广泛关注，涉及民生痛点`, `该事件反映社会深层议题，讨论度高`, `与普通人生活密切相关，传播潜力大`, `情绪共鸣强，容易引发二次传播`],
+    '科技': [`技术/产品类话题，受众精准且付费意愿强`, `行业变革信号，值得关注长期影响`, `科技圈热议，易出深度解读内容`, `创新/突破类话题，适合知识型账号切入`],
+    '娱乐': [`大众关注度高，娱乐属性利于传播`, `粉丝经济驱动，互动数据容易起量`, `话题性强，适合做观点评论或盘点`, `明星/影视相关，搜索量持续走高`],
+    '国际': [`国际局势变化，国内受众关注度上升`, `地缘政治影响全球经济，关联性强`, `跨国事件，多角度解读空间大`, `全球性议题，可结合国内视角分析`],
+    '财经': [`直接影响钱包，用户主动搜索意愿强`, `市场波动话题，财经账号必追`, `政策/数据类信息，专业解读价值高`, `商业案例丰富，适合拆解分析`],
+    '生活': [`贴近日常生活，接地气易引起共鸣`, `实用类内容，收藏转发率高`, `生活方式话题，种草/测评角度好做`, `季节/节日相关，时效性强需抓紧`],
+    '体育': [`赛事热点，实时性要求高`, `竞技体育话题，情绪感染力强`, `明星运动员效应，粉丝基础庞大`, `全民健身趋势，泛体育内容有市场`]
+  };
+  const list = insights[category] || insights['社会'];
+  return list[Math.floor(Math.random() * list.length)];
+}
+
+function generateAngle(title, category) {
+  const angles = {
+    '社会': [`从普通人的视角切入，讲清楚「跟我有什么关系」`, `做时间线梳理，帮读者快速了解来龙去脉`, `对比类似历史事件，分析差异和共性`, `采访/征集网友看法，做民意汇总式内容`],
+    '科技': [`做小白科普向，用通俗语言解释技术原理`, `对比竞品/旧款，突出升级点和差异化`, `预测行业走向，给出你的判断和理由`, `从用户体验角度出发，做真实评测体验`],
+    '娱乐': [`盘点相关作品/人物，做数据对比分析`, `从行业视角解读，不只停留在吃瓜层面`, `做合集/混剪类短视频，流量效果好`, `预测后续发展，引导观众讨论互动`],
+    '国际': [`用中文视角解读，帮助读者理解国际新闻`, `分析对中国的影响，拉近与读者距离`, `梳理历史背景，让复杂局势变清晰`, `对比多方报道，找出信息差和不同立场`],
+    '财经': [`用具体数字说话，把抽象概念具象化`, `讲故事的方式呈现，避免枯燥数据堆砌`, `给实操建议，告诉读者该怎么办`, `从个人财务角度切入，增强代入感`],
+    '生活': [`做实测/亲测类内容，真实感强`, `整理成清单/攻略形式，方便收藏`, `对比多个选项，帮读者做决策`, `分享个人经验/踩坑，建立信任感`],
+    '体育': [`做精彩集锦/高光时刻回顾`, `分析战术/技术细节，满足硬核球迷`, `讲述运动员背后的故事，情感向内容`, `科普规则/历史，吸引泛体育受众`]
+  };
+  const list = angles[category] || angles['社会'];
+  return list[Math.floor(Math.random() * list.length)];
+}
+
+function detectHeat(title, rank) {
+  if (rank <= 3) return '高';
+  if (rank <= 10) return '中';
+  return '低';
+}
+
+// 解析原始文本为话题列表
+function parseRawTopics(raw) {
+  const topics = [];
+  const lines = raw.split(/\n/).map(l => l.trim()).filter(l => l.length > 0);
+  
+  for (const line of lines) {
+    // 匹配各种格式：1. xxx  |  1、xxx  |  【xxx】xxx  |  xxx（数字热度）
+    let match = line.match(/^(?:\d+[\.、\)\]]\s*|【[^】]+】\s*)?(.+?)(?:\s*[\|\s]+\d+(?:万|亿)?(?:热度|阅读|点赞|评论)?)?$/);
+    if (match && match[1]) {
+      let title = match[1].trim();
+      // 清理标题
+      title = title.replace(/^[\d+\.、\)\]\s]+/, '').trim();
+      title = title.replace(/^【[^】]+】\s*/, '').trim();
+      // 过滤太短或无意义的内容
+      if (title.length >= 4 && !/^\d+$/.test(title)) {
+        // 检测来源平台
+        let platforms = [];
+        if (line.match(/微博|weibo/i)) platforms.push('微博');
+        if (line.match(/知乎|zhihu/i)) platforms.push('知乎');
+        if (line.match(/百度|baidu/i)) platforms.push('百度');
+        if (line.match(/B站|bilibili|哔哩哔哩/i)) platforms.push('B站');
+        if (line.match(/抖音|douyin/i)) platforms.push('抖音');
+        if (line.match(/小红书|xiaohongshu|RED/i)) platforms.push('小红书');
+        if (line.match(/Twitter|X\/|trend/i)) platforms.push('Twitter/X');
+        if (line.match(/reddit|r\//i)) platforms.push('Reddit');
+        if (line.match(/youtube|yt/i)) platforms.push('YouTube');
+        if (platforms.length === 0) platforms = ['未知'];
+        
+        topics.push({ rawTitle: title, platforms, rawLine: line });
+      }
+    }
+  }
+  
+  // 去重：相似标题合并
+  const merged = [];
+  const seen = new Set();
+  for (const t of topics) {
+    let key = t.rawTitle.substring(0, 12);
+    let isDup = false;
+    for (const s of seen) {
+      if (s.includes(key) || key.includes(s)) { isDup = true; break; }
+    }
+    if (!isDup) {
+      seen.add(t.rawTitle);
+      merged.push(t);
+    }
+  }
+  
+  return merged;
+}
+
 async function runAnalysis() {
   const raw = document.getElementById('rawInput').value.trim();
   if (!raw) { alert('请先粘贴热榜内容'); return; }
@@ -440,77 +580,63 @@ async function runAnalysis() {
   btn.textContent = '分析中…';
 
   const area = document.getElementById('resultsArea');
-  area.innerHTML = `<div class="loading-box"><div class="spinner"></div><div class="loading-text">AI 正在聚合分析热点<br>识别话题 · 去重合并 · 评分排序<br>约需 15-30 秒…</div></div>`;
+  area.innerHTML = `<div class="loading-box"><div class="spinner"></div><div class="loading-text">正在解析热点数据<br>识别话题 · 去重合并 · 评分排序<br>约需 3-5 秒…</div></div>`;
 
-  const platforms = Array.from(activePlatforms).join('、');
+  // 用 setTimeout 模拟异步，让 UI 有机会更新
+  await new Promise(r => setTimeout(r, 800));
 
-  const prompt = `你是一个专业的内容平台热点分析师，服务于做内容运营的团队。
-
-当前选择的数据平台：${platforms}
-原始热榜数据：
-${raw}
-
-请执行：
-1. 从原始内容中识别并提取所有热点话题
-2. 合并同一事件在不同平台的重复话题
-3. 分析每个热点的内容创作价值
-
-严格返回JSON格式（不输出任何其他文字）：
-{
-  "summary": "今日热点一句话总结（40字以内）",
-  "topics": [
-    {
-      "rank": 1,
-      "title": "话题标题（25字以内，准确简洁）",
-      "score": 88,
-      "category": "社会/科技/娱乐/国际/财经/生活/体育",
-      "region": "cn/intl/both",
-      "platforms": ["微博", "知乎"],
-      "insight": "这个话题的核心爆点或值得关注的原因（35字以内）",
-      "angle": "适合内容创作者的具体切入角度和选题建议（45字以内）",
-      "heat": "高/中/低"
-    }
-  ]
-}
-
-评分标准（满分100）：传播潜力40% + 选题新颖度30% + 目标受众广度30%
-按score从高到低排列，最多返回20条，忽略明显低质量或纯广告内容。`;
-
-      // 检查 API Key
-    if (!apiKey) {
-      alert('请先在右上角设置页填写 Anthropic API Key');
+  try {
+    const parsedTopics = parseRawTopics(raw);
+    
+    if (parsedTopics.length === 0) {
+      area.innerHTML = `<div class="error-box">
+        ⚠️ 未能识别到有效话题<br><br>
+        请检查粘贴内容是否包含具体的热榜条目<br>
+        支持格式：「1. 话题名称」或「【平台名】1. 话题」
+      </div>`;
       btn.disabled = false;
       btn.textContent = '✦ AI 分析';
       return;
     }
 
-    const res = await fetch('/api/analyze', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        prompt: prompt,
-        apiKey: apiKey
-      })
+    // 构建结果
+    const resultTopics = parsedTopics.map((t, idx) => {
+      const category = detectCategory(t.rawTitle);
+      const region = detectRegion(t.rawTitle);
+      const heat = detectHeat(t.rawTitle, idx + 1);
+      const score = calcScore({ title: t.rawTitle, category, region, heat }, idx + 1, t.platforms.length);
+      
+      return {
+        rank: idx + 1,
+        title: t.rawTitle,
+        score: score,
+        category: category,
+        region: region,
+        platforms: t.platforms,
+        insight: generateInsight(t.rawTitle, category),
+        angle: generateAngle(t.rawTitle, category),
+        heat: heat
+      };
     });
 
-    if (!res.ok) throw new Error(`API错误 ${res.status}`);
+    // 按 score 排序
+    resultTopics.sort((a, b) => b.score - a.score);
+    // 更新排名
+    resultTopics.forEach((t, i) => t.rank = i + 1);
 
-    const data = await res.json();
-    const text = data.content.map(i => i.text || '').join('');
-    const clean = text.replace(/```json|```/g, '').trim();
-    const parsed = JSON.parse(clean);
+    const result = {
+      summary: `共识别 ${resultTopics.length} 条热点，${resultTopics.filter(t=>t.score>=75).length}条高分选题`,
+      topics: resultTopics
+    };
 
-    currentResults = parsed;
-    renderResults(parsed);
-    saveToStorage(parsed, raw);
+    currentResults = result;
+    renderResults(result);
+    saveToStorage(result, raw);
 
   } catch (e) {
     area.innerHTML = `<div class="error-box">
       ⚠️ 分析出错：${e.message}<br><br>
-      可能原因：<br>
-      · 网络连接问题，请刷新重试<br>
-      · 粘贴内容过长，请减少内容后重试<br>
-      · API 临时故障，稍后再试
+      请刷新页面后重试
     </div>`;
   }
 
@@ -601,18 +727,6 @@ function renderResults(data, filter) {
 function setFilter(f) {
   activeFilter = f;
   if (currentResults) renderResults(currentResults, f);
-}
-
-// ── API Key ──
-function promptApiKey() {
-  const key = prompt('请输入您的 Anthropic API Key (sk-ant-...):', apiKey);
-  if (key && key.startsWith('sk-ant-')) {
-    apiKey = key;
-    localStorage.setItem('hotpulse_apikey', key);
-    updateApiKeyDisplay();
-  } else if (key) {
-    alert('Key 格式不正确，应以 sk-ant- 开头');
-  }
 }
 
 // ── Storage ──
