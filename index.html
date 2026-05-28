@@ -161,6 +161,33 @@
   footer { margin-top: 60px; padding: 24px 0; border-top: 2px dashed rgba(255,150,100,0.2); text-align: center; font-size: 12px; color: var(--muted); }
   footer .heart { color: var(--accent); }
 
+  /* Hotlist styles */
+  .hotlist-tabs { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:16px; }
+  .hotlist-tab {
+    font-size:12px; font-weight:600; padding:8px 16px; border-radius:20px;
+    border:2px solid var(--border); cursor:pointer; color:var(--muted);
+    background:var(--surface); transition:all .2s; font-family:inherit;
+  }
+  .hotlist-tab.on { background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; border-color:transparent; }
+  .hotlist-tab:hover:not(.on) { color:var(--text); border-color:var(--accent); }
+  .hotlist-platform-name { font-size:14px; font-weight:700; margin-bottom:12px; color:var(--accent); }
+  .hotlist-grid { display:flex; flex-direction:column; gap:6px; }
+  .hotlist-item {
+    display:flex; align-items:center; gap:10px; padding:10px 14px;
+    background:var(--surface); border:1px solid var(--border); border-radius:10px;
+    transition:all .15s; cursor:default; font-size:14px;
+  }
+  .hotlist-item:hover { border-color:var(--accent); transform:translateX(4px); }
+  .hotlist-rank {
+    font-weight:900; font-size:16px; min-width:28px; text-align:center;
+    color:var(--muted); flex-shrink:0;
+  }
+  .hotlist-rank.top { color:#ff4444; }
+  .hotlist-title { flex:1; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .hotlist-hot { font-size:11px; color:var(--accent); font-weight:600; flex-shrink:0; }
+  .hotlist-error { text-align:center; padding:40px; color:var(--muted); font-size:14px; }
+  .hotlist-loading { text-align:center; padding:40px; color:var(--muted); font-size:14px; }
+
   @media (max-width: 600px) {
     .card-top { flex-direction: column; }
     .card-score { flex-direction: row; align-items: center; gap: 12px; }
@@ -192,52 +219,7 @@
     <button class="tab-btn" onclick="switchTab('history', this)">📁 历史记录</button>
   </div>
 
-  <!-- 平台热点 Panel -->
-  <div class="panel active" id="panel-hot">
-    <div class="section-title"><span class="icon">📡</span> 全网热点聚合</div>
-    <p style="font-size:13px;color:var(--muted);margin-bottom:20px;">点击平台卡片，跳转到对应热榜页面。建议每天刷一刷，培养选题敏感度。</p>
-    <div class="platform-grid">
-      <a class="platform-card" href="https://tophub.today/n/KqndgEeLl9" target="_blank">
-        <div class="p-name">🐦 微博热搜</div>
-        <div class="p-desc">娱乐/社会热点首发地</div>
-      </a>
-      <a class="platform-card" href="https://tophub.today/n/mproPpoq6O" target="_blank">
-        <div class="p-name">📘 知乎热榜</div>
-        <div class="p-desc">深度讨论/知识热点</div>
-      </a>
-      <a class="platform-card" href="https://tophub.today/n/DpQvNABoNE" target="_blank">
-        <div class="p-name">🎵 抖音热点</div>
-        <div class="p-desc">短视频风向标</div>
-      </a>
-      <a class="platform-card" href="https://tophub.today/n/5VaobgvAj1" target="_blank">
-        <div class="p-name">📕 小红书</div>
-        <div class="p-desc">种草/生活方式热点</div>
-      </a>
-      <a class="platform-card" href="https://tophub.today/n/xLngunu24O" target="_blank">
-        <div class="p-name">📺 B站热门</div>
-        <div class="p-desc">年轻用户聚集地</div>
-      </a>
-      <a class="platform-card" href="https://tophub.today/" target="_blank">
-        <div class="p-name">📊 今日热榜</div>
-        <div class="p-desc">全网热点聚合站</div>
-      </a>
-      <a class="platform-card" href="https://tophub.today/n/Ku7b7CB2Ql" target="_blank">
-        <div class="p-name">🌍 Twitter趋势</div>
-        <div class="p-desc">国际热点/英文趋势（聚合页，国内可访问）</div>
-      </a>
-      <a class="platform-card" href="https://tophub.today/n/yVowGg0oD0" target="_blank">
-        <div class="p-name">🤖 Reddit热帖</div>
-        <div class="p-desc">全球社区热点（聚合页，国内可访问）</div>
-      </a>
-      <a class="platform-card" href="https://tophub.today/n/7Ci93d60bJ" target="_blank">
-        <div class="p-name">▶️ YouTube热门</div>
-        <div class="p-desc">视频内容风向（聚合页，国内可访问）</div>
-      </a>
-    </div>
-    <div class="analyze-box" style="margin-top:32px;">
-      <div class="analyze-header">💡 小技巧：建议每天早中晚各刷一次热榜，把有意思的话题复制到「选题分析」里评分</div>
-    </div>
-  </div>
+
 
     <!-- 平台热点 Panel -->
   <div class="panel active" id="panel-hot">
