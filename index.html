@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -161,6 +161,30 @@
   footer { margin-top: 60px; padding: 24px 0; border-top: 2px dashed rgba(255,150,100,0.2); text-align: center; font-size: 12px; color: var(--muted); }
   footer .heart { color: var(--accent); }
 
+  .hotlist-tabs { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
+  .hotlist-tab {
+    font-size: 12px; padding: 7px 16px; border-radius: 20px;
+    border: 2px solid var(--border); cursor: pointer;
+    color: var(--muted); background: var(--surface); transition: all .2s; font-weight: 500;
+  }
+  .hotlist-tab.on { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; border-color: transparent; }
+  .hotlist-tab:hover:not(.on) { color: var(--text); border-color: var(--accent); }
+  .hotlist-grid { display: flex; flex-direction: column; gap: 6px; }
+  .hotlist-item {
+    display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+    background: var(--surface); border: 1.5px solid var(--border);
+    border-radius: 12px; transition: all .2s; cursor: pointer; text-decoration: none; color: inherit;
+  }
+  .hotlist-item:hover { border-color: var(--accent); box-shadow: 0 4px 12px rgba(255,123,84,0.1); }
+  .hotlist-rank { font-weight: 900; font-size: 16px; min-width: 28px; text-align: center; color: var(--muted); }
+  .hotlist-rank.top { background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .hotlist-title { flex: 1; font-size: 14px; line-height: 1.5; }
+  .hotlist-hot { font-size: 11px; color: var(--muted); white-space: nowrap; min-width: 60px; text-align: right; }
+  .hotlist-loading { text-align: center; padding: 60px 24px; color: var(--muted); font-size: 14px; }
+  .hotlist-error { text-align: center; padding: 40px 24px; color: var(--danger); font-size: 13px; }
+  .hotlist-platform-name { font-size: 15px; font-weight: 700; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+
+  
   @media (max-width: 600px) {
     .card-top { flex-direction: column; }
     .card-score { flex-direction: row; align-items: center; gap: 12px; }
@@ -190,53 +214,6 @@
     <button class="tab-btn" onclick="switchTab('analyze', this)">📊 选题分析</button>
     <button class="tab-btn" onclick="switchTab('content', this)">💡 爆款内容库</button>
     <button class="tab-btn" onclick="switchTab('history', this)">📁 历史记录</button>
-  </div>
-
-  <!-- 平台热点 Panel -->
-  <div class="panel active" id="panel-hot">
-    <div class="section-title"><span class="icon">📡</span> 全网热点聚合</div>
-    <p style="font-size:13px;color:var(--muted);margin-bottom:20px;">点击平台卡片，跳转到对应热榜页面。建议每天刷一刷，培养选题敏感度。</p>
-    <div class="platform-grid">
-      <a class="platform-card" href="https://tophub.today/n/KqndgEeLl9" target="_blank">
-        <div class="p-name">🐦 微博热搜</div>
-        <div class="p-desc">娱乐/社会热点首发地</div>
-      </a>
-      <a class="platform-card" href="https://tophub.today/n/mproPpoq6O" target="_blank">
-        <div class="p-name">📘 知乎热榜</div>
-        <div class="p-desc">深度讨论/知识热点</div>
-      </a>
-      <a class="platform-card" href="https://tophub.today/n/DpQvNABoNE" target="_blank">
-        <div class="p-name">🎵 抖音热点</div>
-        <div class="p-desc">短视频风向标</div>
-      </a>
-      <a class="platform-card" href="https://tophub.today/n/5VaobgvAj1" target="_blank">
-        <div class="p-name">📕 小红书</div>
-        <div class="p-desc">种草/生活方式热点</div>
-      </a>
-      <a class="platform-card" href="https://tophub.today/n/xLngunu24O" target="_blank">
-        <div class="p-name">📺 B站热门</div>
-        <div class="p-desc">年轻用户聚集地</div>
-      </a>
-      <a class="platform-card" href="https://tophub.today/" target="_blank">
-        <div class="p-name">📊 今日热榜</div>
-        <div class="p-desc">全网热点聚合站</div>
-      </a>
-      <a class="platform-card" href="https://tophub.today/n/Ku7b7CB2Ql" target="_blank">
-        <div class="p-name">🌍 Twitter趋势</div>
-        <div class="p-desc">国际热点/英文趋势（聚合页，国内可访问）</div>
-      </a>
-      <a class="platform-card" href="https://tophub.today/n/yVowGg0oD0" target="_blank">
-        <div class="p-name">🤖 Reddit热帖</div>
-        <div class="p-desc">全球社区热点（聚合页，国内可访问）</div>
-      </a>
-      <a class="platform-card" href="https://tophub.today/n/7Ci93d60bJ" target="_blank">
-        <div class="p-name">▶️ YouTube热门</div>
-        <div class="p-desc">视频内容风向（聚合页，国内可访问）</div>
-      </a>
-    </div>
-    <div class="analyze-box" style="margin-top:32px;">
-      <div class="analyze-header">💡 小技巧：建议每天早中晚各刷一次热榜，把有意思的话题复制到「选题分析」里评分</div>
-    </div>
   </div>
 
   <!-- 选题分析 Panel -->
@@ -970,6 +947,120 @@ function loadHistory(idx) {
   if (tabBtns[1]) tabBtns[1].classList.add('active');
   renderResults(h.data, 'all');
 }
+
+// ── Hotlist (real-time hot topics) ──
+var hotlistData = null;
+var hotlistCurrentPlatform = 'all';
+
+async function loadHotlist(platform) {
+  platform = platform || 'all';
+  hotlistCurrentPlatform = platform;
+  var tabsEl = document.getElementById('hotlist-tabs');
+  var contentEl = document.getElementById('hotlist-content');
+  if (!tabsEl || !contentEl) return;
+
+  // Render tabs
+  var platforms = [
+    {key:'all', name:'🌐 全部'},
+    {key:'weibo', name:'🐦 微博'},
+    {key:'zhihu', name:'📘 知乎'},
+    {key:'bilibili', name:'📺 B站'},
+    {key:'douyin', name:'🎵 抖音'},
+    {key:'xiaohongshu', name:'📕 小红书'},
+    {key:'twitter', name:'🌍 Twitter'},
+    {key:'reddit', name:'🤖 Reddit'}
+  ];
+  tabsEl.innerHTML = platforms.map(function(p) {
+    return '<button class="hotlist-tab' + (p.key===platform?' on':'') + '" onclick="loadHotlist(\'' + p.key + '\')">' + p.name + '</button>';
+  }).join('');
+
+  contentEl.innerHTML = '<div class="hotlist-loading">⏳ 正在从云端抓取热榜，请稍候…</div>';
+
+  try {
+    var resp = await fetch('/api/hotlist?platform=' + platform + '&_t=' + Date.now());
+    var j = await resp.json();
+    if (!j.success) throw new Error(j.error || '抓取失败');
+    hotlistData = j.data;
+    document.getElementById('hotlist-updated').textContent = '更新于 ' + new Date(j.updatedAt || Date.now()).toLocaleTimeString('zh-CN');
+    renderHotlist(platform, j.data);
+  } catch(e) {
+    contentEl.innerHTML = '<div class="hotlist-error">❌ 加载失败：' + escapeHtml(e.message) + '<br><br><button class="btn btn-secondary" onclick="loadHotlist(\'' + platform + '\')">🔄 重新加载</button></div>';
+  }
+}
+
+function renderHotlist(platform, data) {
+  var contentEl = document.getElementById('hotlist-content');
+  if (!contentEl) return;
+
+  if (platform === 'all') {
+    // Show all platforms that have data
+    var keys = Object.keys(data || {});
+    var html = '';
+    for (var i=0; i<keys.length; i++) {
+      var key = keys[i];
+      var plat = data[key];
+      if (!plat || !plat.data) {
+        html += '<div class="hotlist-error" style="margin-bottom:16px;text-align:left;">⚠️ ' + escapeHtml(key) + '：数据源不可用</div>';
+        continue;
+      }
+      html += renderHotlistSection(key, plat);
+    }
+    contentEl.innerHTML = html || '<div class="hotlist-error">暂无可用热榜数据</div>';
+  } else {
+    var plat = data;
+    if (!plat || !plat.data) {
+      contentEl.innerHTML = '<div class="hotlist-error">⚠️ ' + platform + ' 数据源暂不可用，请稍后重试</div>';
+      return;
+    }
+    contentEl.innerHTML = renderHotlistSection(platform, plat);
+  }
+}
+
+function renderHotlistSection(key, plat) {
+  var items = plat.data || [];
+  if (!items.length) return '<div class="hotlist-error" style="margin-bottom:20px;">' + (plat.icon||'') + ' ' + escapeHtml(plat.name||key) + '：暂无数据</div>';
+
+  var rows = '';
+  for (var i=0; i<Math.min(items.length,20); i++) {
+    var item = items[i];
+    var rankCls = i<3 ? ' top' : '';
+    var url = item.url || '';
+    var titleHtml = escapeHtml(item.title || '');
+    var inner = '<span class="hotlist-rank' + rankCls + '">' + String(item.rank||i+1).padStart(2,'0') + '</span>' +
+      '<span class="hotlist-title">' + titleHtml + '</span>' +
+      (item.hot ? '<span class="hotlist-hot">' + escapeHtml(String(item.hot)) + '</span>' : '');
+    if (url) {
+      rows += '<a class="hotlist-item" href="' + escapeAttr(url) + '" target="_blank" rel="noopener">' + inner + '</a>';
+    } else {
+      rows += '<div class="hotlist-item" style="cursor:default;">' + inner + '</div>';
+    }
+  }
+  return '<div style="margin-bottom:28px;"><div class="hotlist-platform-name">' + (plat.icon||'🔥') + ' ' + escapeHtml(plat.name||key) + '</div><div class="hotlist-grid">' + rows + '</div></div>';
+}
+
+function escapeAttr(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// Auto-load hotlist when panel becomes visible
+var _origSwitchTab = switchTab;
+// Override: call loadHotlist on first hot tab click
+var _hotlistLoaded = false;
+function switchTab(tabName, btn) {
+  var panels = document.querySelectorAll('.panel');
+  for (var i = 0; i < panels.length; i++) panels[i].classList.remove('active');
+  var tabs = document.querySelectorAll('.tab-btn');
+  for (var j = 0; j < tabs.length; j++) tabs[j].classList.remove('active');
+  document.getElementById('panel-' + tabName).classList.add('active');
+  btn.classList.add('active');
+  if (tabName === 'history') renderHistory();
+  if (tabName === 'hot' && !_hotlistLoaded) {
+    _hotlistLoaded = true;
+    loadHotlist('all');
+  }
+}
+
 </script>
 </body>
 </html>
+
