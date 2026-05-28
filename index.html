@@ -3,257 +3,303 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HOTPULSE · 全网热点聚合 AI分析</title>
+<title>猪小媒 · 新媒体热点选题雷达</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0a0a0f;
-    --surface: #13131a;
-    --surface2: #1c1c26;
-    --border: rgba(255,255,255,0.07);
-    --accent: #7c6aff;
-    --accent2: #ff6a6a;
-    --accent3: #6affb8;
-    --text: #f0f0f5;
-    --muted: #6b6b80;
-    --tag-cn: rgba(100,160,255,0.15);
-    --tag-cn-t: #82b4ff;
-    --tag-intl: rgba(255,160,80,0.15);
-    --tag-intl-t: #ffa55a;
-    --tag-tech: rgba(80,220,140,0.15);
-    --tag-tech-t: #50dc8c;
-    --tag-ent: rgba(240,100,200,0.15);
-    --tag-ent-t: #f064c8;
-    --tag-social: rgba(200,200,100,0.15);
-    --tag-social-t: #d4d44a;
+    --bg: #fffbf5;
+    --surface: #ffffff;
+    --surface2: #fff9f0;
+    --border: rgba(255,150,100,0.15);
+    --accent: #ff7b54;
+    --accent2: #ffb26b;
+    --accent3: #ffd56b;
+    --text: #2d2d2d;
+    --muted: #8b8b8b;
+    --pink: #ffb5b5;
+    --success: #7dd87d;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    background: var(--bg);
-    font-family: 'DM Sans', sans-serif;
+    background: linear-gradient(135deg, #fff5eb 0%, #fffbf5 50%, #fff0e6 100%);
+    font-family: 'Noto Sans SC', sans-serif;
     color: var(--text);
     min-height: 100vh;
   }
 
-  /* ── Layout ── */
-  .app { max-width: 900px; margin: 0 auto; padding: 0 16px 60px; }
+  .app { max-width: 1100px; margin: 0 auto; padding: 0 16px 60px; }
 
-  /* ── Top bar ── */
-  .topbar {
+  /* ── Header ── */
+  .header {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 20px 0 0;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 0;
+    padding: 24px 0 20px;
+    border-bottom: 2px dashed rgba(255,150,100,0.2);
   }
-  .logo {
-    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 22px;
-    letter-spacing: -0.03em;
+  .logo-box { display: flex; align-items: center; gap: 12px; }
+  .logo-icon {
+    width: 48px; height: 48px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px;
+    box-shadow: 0 4px 12px rgba(255,123,84,0.3);
   }
-  .logo span.accent { color: var(--accent); }
-  .logo-sub { font-size: 12px; font-weight: 400; color: var(--muted); font-family: 'DM Sans', sans-serif; margin-left: 8px; }
-  .topbar-right { font-size: 12px; color: var(--muted); text-align: right; line-height: 1.5; }
-  .topbar-right a { color: var(--accent); text-decoration: none; }
-  .topbar-right a:hover { text-decoration: underline; }
+  .logo-text h1 {
+    font-size: 24px; font-weight: 900;
+    background: linear-gradient(135deg, var(--accent), #ff9a6c);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .logo-text p { font-size: 12px; color: var(--muted); font-weight: 400; }
+  .header-right { text-align: right; font-size: 12px; color: var(--muted); }
+  .header-right .tag {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--pink), #ffc8c8);
+    color: #c44;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+    font-size: 11px;
+    margin-top: 6px;
+  }
 
   /* ── Tabs ── */
-  .tabs { display: flex; gap: 2px; padding-top: 16px; border-bottom: 1px solid var(--border); }
+  .tabs {
+    display: flex; gap: 4px; padding-top: 20px;
+    border-bottom: 2px solid rgba(255,150,100,0.12);
+  }
   .tab-btn {
-    font-family: 'DM Sans', sans-serif; font-size: 13px;
-    padding: 9px 18px; border-radius: 8px 8px 0 0;
-    border: none; cursor: pointer; transition: all .2s;
+    font-size: 14px; font-weight: 500;
+    padding: 12px 22px; border-radius: 10px 10px 0 0;
+    border: none; cursor: pointer; transition: all .25s;
     color: var(--muted); background: transparent;
   }
-  .tab-btn.active { background: var(--surface2); color: var(--text); }
+  .tab-btn.active {
+    background: var(--surface);
+    color: var(--accent);
+    box-shadow: 0 -2px 8px rgba(255,123,84,0.1);
+  }
   .tab-btn:hover:not(.active) { color: var(--text); }
 
   /* ── Panel ── */
-  .panel { display: none; padding-top: 24px; }
+  .panel { display: none; padding-top: 28px; }
   .panel.active { display: block; }
 
-  /* ── Input section ── */
-  .section-label {
-    font-size: 11px; color: var(--muted); letter-spacing: .07em;
-    text-transform: uppercase; margin-bottom: 10px;
-  }
-  .platform-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
-  .pill {
-    font-size: 12px; padding: 5px 12px; border-radius: 20px;
-    border: 1px solid var(--border); cursor: pointer; transition: all .2s;
-    color: var(--muted); background: transparent;
-    font-family: 'DM Sans', sans-serif;
-  }
-  .pill.on { border-color: var(--accent); color: var(--accent); background: rgba(124,106,255,0.12); }
-
-  .input-row { display: flex; gap: 10px; align-items: flex-start; }
-  textarea {
-    flex: 1; background: var(--surface); border: 1px solid var(--border);
-    border-radius: 12px; color: var(--text);
-    font-family: 'DM Sans', sans-serif; font-size: 13px;
-    padding: 14px 16px; resize: vertical; min-height: 140px;
-    outline: none; transition: border .2s; line-height: 1.7;
-  }
-  textarea:focus { border-color: rgba(124,106,255,0.5); }
-  textarea::placeholder { color: var(--muted); }
-
-  .btn-col { display: flex; flex-direction: column; gap: 8px; }
-  .run-btn {
-    background: var(--accent); color: #fff; border: none; border-radius: 10px;
-    padding: 0 20px; height: 48px;
-    font-family: 'Syne', sans-serif; font-weight: 600; font-size: 14px;
-    cursor: pointer; white-space: nowrap; transition: all .2s;
+  /* ── Section ── */
+  .section-title {
+    font-size: 16px; font-weight: 700; margin-bottom: 16px;
     display: flex; align-items: center; gap: 8px;
   }
-  .run-btn:hover { background: #9080ff; transform: translateY(-1px); }
-  .run-btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
-  .clear-btn {
-    background: transparent; color: var(--muted); border: 1px solid var(--border);
-    border-radius: 10px; padding: 0 16px; height: 36px;
-    font-family: 'DM Sans', sans-serif; font-size: 12px;
-    cursor: pointer; transition: all .2s;
+  .section-title .icon { font-size: 20px; }
+
+  /* ── 平台热点模块 ── */
+  .platform-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px; margin-bottom: 24px;
   }
-  .clear-btn:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+  .platform-card {
+    background: var(--surface); border: 2px solid var(--border);
+    border-radius: 14px; padding: 16px;
+    cursor: pointer; transition: all .25s;
+  }
+  .platform-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(255,123,84,0.15);
+  }
+  .platform-card .p-name { font-weight: 700; font-size: 15px; margin-bottom: 6px; }
+  .platform-card .p-desc { font-size: 11px; color: var(--muted); }
+  .platform-card .p-badge {
+    position: absolute; top: -6px; right: -6px;
+    background: var(--accent); color: #fff;
+    font-size: 10px; padding: 2px 7px;
+    border-radius: 10px;
+  }
+
+  /* ── 选题分析模块 ── */
+  .analyze-box {
+    background: var(--surface); border: 2px solid var(--border);
+    border-radius: 18px; padding: 24px; margin-bottom: 24px;
+  }
+  .analyze-header { font-size: 14px; color: var(--muted); margin-bottom: 12px; }
+  .analyze-input {
+    width: 100%; background: var(--surface2);
+    border: 2px solid rgba(255,150,100,0.1);
+    border-radius: 12px; color: var(--text);
+    font-size: 14px; padding: 16px;
+    min-height: 160px; resize: vertical;
+    outline: none; transition: border .2s;
+    font-family: inherit;
+  }
+  .analyze-input:focus { border-color: var(--accent); }
+  .analyze-input::placeholder { color: #bbb; }
+  .analyze-actions {
+    display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap;
+  }
+  .btn {
+    padding: 12px 24px; border-radius: 12px;
+    border: none; cursor: pointer; font-weight: 600;
+    font-size: 14px; transition: all .25s;
+    font-family: inherit;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(255,123,84,0.35);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,123,84,0.4); }
+  .btn-primary:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+  .btn-secondary {
+    background: var(--surface2); color: var(--muted);
+    border: 2px solid var(--border);
+  }
+  .btn-secondary:hover { color: var(--text); border-color: var(--accent); }
 
   /* ── Results ── */
   .results-area { margin-top: 28px; }
   .results-header {
     display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 14px;
+    margin-bottom: 16px; flex-wrap: wrap; gap: 12px;
   }
-  .results-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; }
-  .filter-row { display: flex; gap: 6px; }
+  .results-title { font-weight: 700; font-size: 16px; }
+  .filter-row { display: flex; gap: 6px; flex-wrap: wrap; }
   .filter-btn {
-    font-size: 12px; padding: 4px 12px; border-radius: 6px;
-    border: 1px solid var(--border); cursor: pointer;
-    color: var(--muted); background: transparent;
-    font-family: 'DM Sans', sans-serif; transition: all .18s;
+    font-size: 12px; padding: 6px 14px; border-radius: 20px;
+    border: 2px solid var(--border); cursor: pointer;
+    color: var(--muted); background: var(--surface);
+    transition: all .2s; font-family: inherit; font-weight: 500;
   }
-  .filter-btn.on { background: rgba(255,255,255,0.07); color: var(--text); border-color: rgba(255,255,255,0.18); }
-
-  .summary-bar {
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 10px; padding: 13px 16px;
-    margin-bottom: 16px; font-size: 13px; line-height: 1.7;
+  .filter-btn.on {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff; border-color: transparent;
   }
-  .summary-bar strong { color: var(--accent); }
 
-  .topic-list { display: flex; flex-direction: column; gap: 10px; }
+  .topic-list { display: flex; flex-direction: column; gap: 12px; }
   .topic-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 14px; padding: 16px 18px;
-    transition: border-color .2s, transform .15s;
+    background: var(--surface); border: 2px solid var(--border);
+    border-radius: 16px; padding: 20px;
+    transition: all .25s;
   }
-  .topic-card:hover { border-color: rgba(255,255,255,0.14); transform: translateY(-1px); }
-  .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .topic-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 8px 24px rgba(255,123,84,0.12);
+  }
+  .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
   .card-left { display: flex; align-items: flex-start; gap: 14px; flex: 1; }
   .rank-num {
-    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 20px;
-    color: var(--muted); min-width: 32px; padding-top: 1px; line-height: 1;
+    font-weight: 900; font-size: 24px; color: var(--muted);
+    min-width: 36px;
   }
-  .rank-num.top { color: var(--accent); }
-  .topic-text { font-size: 15px; line-height: 1.5; }
-  .card-score { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; min-width: 52px; }
-  .score-val { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 24px; line-height: 1; }
-  .score-label { font-size: 10px; color: var(--muted); }
-  .score-bar { height: 3px; border-radius: 2px; background: var(--border); overflow: hidden; width: 52px; margin-top: 2px; }
-  .score-fill { height: 100%; border-radius: 2px; background: var(--accent); }
+  .rank-num.top {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .topic-text { font-size: 16px; line-height: 1.6; font-weight: 500; }
+  .card-score { text-align: center; min-width: 70px; }
+  .score-val { font-weight: 900; font-size: 28px; }
+  .score-high { color: var(--success); }
+  .score-mid { color: var(--accent); }
+  .score-low { color: var(--muted); }
+  .score-label { font-size: 11px; color: var(--muted); }
+  .score-bar { height: 4px; background: #eee; border-radius: 2px; margin-top: 4px; overflow: hidden; }
+  .score-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width .5s; }
 
-  .card-meta { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
-  .tag { font-size: 11px; padding: 3px 9px; border-radius: 5px; }
-  .tag.cn { background: var(--tag-cn); color: var(--tag-cn-t); }
-  .tag.intl { background: var(--tag-intl); color: var(--tag-intl-t); }
-  .tag.tech { background: var(--tag-tech); color: var(--tag-tech-t); }
-  .tag.ent { background: var(--tag-ent); color: var(--tag-ent-t); }
-  .tag.social { background: var(--tag-social); color: var(--tag-social-t); }
-  .tag.src { background: rgba(255,255,255,0.05); color: var(--muted); }
+  .card-meta { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag {
+    font-size: 11px; padding: 4px 10px; border-radius: 6px;
+    font-weight: 500;
+  }
+  .tag-pink { background: var(--pink); color: #a44; }
+  .tag-orange { background: rgba(255,180,100,0.2); color: #c80; }
+  .tag-green { background: rgba(125,216,125,0.2); color: #496; }
+  .tag-gray { background: #f0f0f0; color: #888; }
 
   .insight {
-    margin-top: 10px; font-size: 12px; color: var(--muted);
-    line-height: 1.7; border-left: 2px solid rgba(124,106,255,0.4);
-    padding-left: 12px; font-style: italic;
+    margin-top: 12px; font-size: 13px; color: #666;
+    line-height: 1.7; border-left: 3px solid var(--accent);
+    padding-left: 14px; font-style: italic;
   }
   .angle {
-    margin-top: 8px; font-size: 13px; color: var(--accent3); line-height: 1.6;
-    background: rgba(106,255,184,0.05); border-radius: 8px; padding: 8px 12px;
+    margin-top: 10px; font-size: 13px; color: #2a6;
+    background: rgba(125,216,125,0.1); border-radius: 10px;
+    padding: 10px 14px; line-height: 1.6;
   }
-  .angle strong { font-weight: 500; color: rgba(106,255,184,0.7); }
+  .angle strong { color: #496; }
 
-  /* ── States ── */
+  /* ── 爆款内容库 ── */
+  .content-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+  .content-card {
+    background: var(--surface); border: 2px solid var(--border);
+    border-radius: 16px; padding: 18px;
+    transition: all .25s;
+  }
+  .content-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+  }
+  .content-card .c-platform {
+    font-size: 11px; color: var(--muted); margin-bottom: 8px;
+  }
+  .content-card .c-title {
+    font-size: 14px; font-weight: 600; line-height: 1.5;
+    margin-bottom: 10px;
+  }
+  .content-card .c-data {
+    font-size: 12px; color: var(--muted);
+    display: flex; gap: 12px; flex-wrap: wrap;
+  }
+  .content-card .c-data span { color: var(--accent); font-weight: 600; }
+
+  /* ── History ── */
+  .hist-card {
+    background: var(--surface); border: 2px solid var(--border);
+    border-radius: 14px; padding: 16px 20px; margin-bottom: 12px;
+    cursor: pointer; transition: all .2s;
+    display: flex; align-items: center; gap: 20px;
+  }
+  .hist-card:hover { border-color: var(--accent); }
+  .hist-count { font-weight: 900; font-size: 28px; color: var(--accent); min-width: 50px; text-align: center; }
+  .hist-info { flex: 1; }
+  .hist-date { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+  .hist-preview { font-size: 13px; }
+  .hist-tip { font-size: 12px; color: var(--muted); }
+
+  /* ── Loading / Empty ── */
   .loading-box { text-align: center; padding: 60px 24px; }
   .spinner {
-    width: 40px; height: 40px; border: 2px solid var(--border);
+    width: 44px; height: 44px; border: 3px solid var(--border);
     border-top-color: var(--accent); border-radius: 50%;
-    animation: spin .8s linear infinite; margin: 0 auto 20px;
+    animation: spin .7s linear infinite; margin: 0 auto 20px;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
   .loading-text { color: var(--muted); font-size: 14px; line-height: 1.8; }
 
   .empty-state { text-align: center; padding: 60px 24px; }
-  .empty-icon { font-size: 40px; margin-bottom: 14px; }
+  .empty-icon { font-size: 48px; margin-bottom: 16px; }
   .empty-text { color: var(--muted); font-size: 14px; line-height: 1.8; }
 
-  .error-box {
-    background: rgba(255,100,100,0.07); border: 1px solid rgba(255,100,100,0.2);
-    border-radius: 10px; padding: 16px; font-size: 13px; color: #ff8888; line-height: 1.7;
-  }
-
-  .s-high { color: var(--accent3); }
-  .s-mid  { color: var(--accent); }
-  .s-low  { color: var(--muted); }
-
-  /* ── History ── */
-  .hist-empty { text-align: center; padding: 48px; color: var(--muted); font-size: 13px; line-height: 1.8; }
-  .hist-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 12px; padding: 14px 18px; margin-bottom: 10px;
-    cursor: pointer; transition: border-color .2s, transform .15s;
-    display: flex; align-items: center; gap: 16px;
-  }
-  .hist-card:hover { border-color: rgba(255,255,255,0.15); transform: translateY(-1px); }
-  .hist-date { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
-  .hist-preview { font-size: 13px; }
-  .hist-count { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 22px; color: var(--accent); min-width: 40px; text-align: center; }
-  .hist-count-label { font-size: 10px; color: var(--muted); text-align: center; }
-
-  /* ── Guide ── */
-  .guide { max-width: 620px; }
-  .guide-step {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 14px; padding: 20px 22px; margin-bottom: 12px;
-  }
-  .guide-step-num {
-    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 11px;
-    color: var(--accent); letter-spacing: .1em; margin-bottom: 8px;
-  }
-  .guide-step-title { font-size: 15px; font-weight: 500; margin-bottom: 8px; }
-  .guide-step-body { font-size: 13px; color: var(--muted); line-height: 1.8; }
-  .guide-step-body a { color: var(--accent); text-decoration: none; }
-  .guide-step-body a:hover { text-decoration: underline; }
-  .guide-step-body code {
-    background: rgba(124,106,255,0.12); color: var(--accent);
-    padding: 1px 6px; border-radius: 4px; font-size: 12px;
-  }
-
   /* ── Footer ── */
-  .free-badge {
-    display: inline-block; background: rgba(106,255,184,0.12); color: var(--accent3);
-    padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 500;
-  }
   footer {
-    margin-top: 60px; padding: 20px 0; border-top: 1px solid var(--border);
-    font-size: 12px; color: var(--muted); text-align: center; line-height: 1.8;
+    margin-top: 60px; padding: 24px 0;
+    border-top: 2px dashed rgba(255,150,100,0.2);
+    text-align: center; font-size: 12px; color: var(--muted);
   }
-  footer a { color: var(--accent); text-decoration: none; }
+  footer .heart { color: var(--accent); }
 
   /* ── Responsive ── */
   @media (max-width: 600px) {
-    .input-row { flex-direction: column; }
-    .btn-col { flex-direction: row; flex-wrap: wrap; }
-    .run-btn { flex: 1; justify-content: center; }
     .card-top { flex-direction: column; }
-    .card-score { flex-direction: row; align-items: center; gap: 10px; }
+    .card-score { flex-direction: row; align-items: center; gap: 12px; }
+    .platform-grid { grid-template-columns: 1fr 1fr; }
   }
 </style>
 </head>
@@ -261,124 +307,170 @@
 
 <div class="app">
 
-  <!-- Top bar -->
-  <div class="topbar">
-    <div>
-      <span class="logo">HOT<span class="accent">PULSE</span><span class="logo-sub">全网热点聚合 · AI分析版</span></span>
+  <!-- Header -->
+  <div class="header">
+    <div class="logo-box">
+      <div class="logo-icon">🐷</div>
+      <div class="logo-text">
+        <h1>猪小媒</h1>
+        <p>新媒体热点选题雷达 · 帮你找爆款</p>
+      </div>
     </div>
-    <div class="topbar-right">
+    <div class="header-right">
       <span id="ts">—</span><br>
-      <span style="color:var(--accent3);font-size:11px">✦ 完全免费 · 无需API</span><br>
-      数据源：<a href="https://tophub.today" target="_blank">今日热榜</a> · <a href="https://trends24.in" target="_blank">Twitter趋势</a> · <a href="https://reddit.com/r/popular" target="_blank">Reddit</a>
+      <span class="tag">✦ 完全免费 · 无需注册</span>
     </div>
   </div>
 
   <!-- Tabs -->
   <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('analyze', this)">🔍 热点分析</button>
+    <button class="tab-btn active" onclick="switchTab('hot', this)">🔥 平台热点</button>
+    <button class="tab-btn" onclick="switchTab('analyze', this)">📊 选题分析</button>
+    <button class="tab-btn" onclick="switchTab('content', this)">💡 爆款内容库</button>
     <button class="tab-btn" onclick="switchTab('history', this)">📁 历史记录</button>
-    <button class="tab-btn" onclick="switchTab('guide', this)">📖 使用指南</button>
   </div>
 
-  <!-- ── Analyze Panel ── -->
-  <div class="panel active" id="panel-analyze">
+  <!-- ── 平台热点 Panel ── -->
+  <div class="panel active" id="panel-hot">
+    <div class="section-title"><span class="icon">📡</span> 全网热点聚合</div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:20px;">点击平台卡片，跳转到对应热榜页面。建议每天刷一刷，培养选题敏感度。</p>
+    
+    <div class="platform-grid">
+      <a class="platform-card" href="https://s.weibo.com/top/summary" target="_blank" style="position:relative">
+        <div class="p-name">🐦 微博热搜</div>
+        <div class="p-desc">娱乐/社会热点首发地</div>
+      </a>
+      <a class="platform-card" href="https://www.zhihu.com/hot" target="_blank">
+        <div class="p-name">📘 知乎热榜</div>
+        <div class="p-desc">深度讨论/知识热点</div>
+      </a>
+      <a class="platform-card" href="https://www.douyin.com/hot" target="_blank">
+        <div class="p-name">🎵 抖音热点</div>
+        <div class="p-desc">短视频风向标</div>
+      </a>
+      <a class="platform-card" href="https://www.xiaohongshu.com/explore" target="_blank">
+        <div class="p-name">📕 小红书</div>
+        <div class="p-desc">种草/生活方式热点</div>
+      </a>
+      <a class="platform-card" href="https://www.bilibili.com/v/popular/all" target="_blank">
+        <div class="p-name">📺 B站热门</div>
+        <div class="p-desc">年轻用户聚集地</div>
+      </a>
+      <a class="platform-card" href="https://tophub.today" target="_blank">
+        <div class="p-name">📊 今日热榜</div>
+        <div class="p-desc">全网热点聚合站</div>
+      </a>
+      <a class="platform-card" href="https://trends24.in/china/" target="_blank">
+        <div class="p-name">🌍 Twitter趋势</div>
+        <div class="p-desc">国际热点/英文趋势</div>
+      </a>
+      <a class="platform-card" href="https://www.reddit.com/r/popular" target="_blank">
+        <div class="p-name">🤖 Reddit热帖</div>
+        <div class="p-desc">全球社区热点</div>
+      </a>
+      <a class="platform-card" href="https://www.youtube.com/feed/trending" target="_blank">
+        <div class="p-name">▶️ YouTube热门</div>
+        <div class="p-desc">视频内容风向</div>
+      </a>
+    </div>
 
-    <div class="section-label">① 选择平台来源（点击取消/添加）</div>
-    <div class="platform-pills" id="pills"></div>
+    <div class="analyze-box" style="margin-top:32px;">
+      <div class="analyze-header">💡 小技巧：建议每天早中晚各刷一次热榜，把有意思的话题复制到「选题分析」里评分</div>
+    </div>
+  </div>
 
-    <div class="section-label">② 粘贴热榜内容 — 支持任意格式，AI 自动解析</div>
-    <div class="input-row">
-      <textarea id="rawInput" placeholder="把各平台热榜内容粘贴到这里，例如：
+  <!-- ── 选题分析 Panel ── -->
+  <div class="panel" id="panel-analyze">
+    <div class="section-title"><span class="icon">🔬</span> 选题热度分析</div>
+    
+    <div class="analyze-box">
+      <div class="analyze-header">粘贴热榜内容，AI 自动分析选题价值</div>
+      <textarea class="analyze-input" id="rawInput" placeholder="把各平台热榜内容粘贴到这里，例如：
 
 【微博热搜】1. 山西煤矿爆炸82人遇难 2. 盒马郑重道歉 3. 抖音禁止录播伪装直播...
 【知乎热榜】1. 山西煤矿事故 1325万热度  2. 腾讯放弃音频独家版权...
-【Twitter Trends】1. Memorial Day  2. Iran deal  3. Gaza ceasefire...
-【Reddit r/worldnews】US attacks Iran missile sites in self-defense...
-【B站热门】1. 原神新版本 2. 英伟达量子AI...
+【抖音热点】1. 原神新版本 2. 英伟达量子AI...
 
 不需要整理格式，直接粘贴即可。"></textarea>
-      <div class="btn-col">
-        <button class="run-btn" id="runBtn" onclick="runAnalysis()">
-          ✦ AI 分析
-        </button>
-        <button class="clear-btn" onclick="clearInput()">清空</button>
+      <div class="analyze-actions">
+        <button class="btn btn-primary" id="runBtn" onclick="runAnalysis()">✦ 开始分析</button>
+        <button class="btn btn-secondary" onclick="clearInput()">清空内容</button>
       </div>
     </div>
 
     <div class="results-area" id="resultsArea">
       <div class="empty-state">
-        <div class="empty-icon">⚡</div>
+        <div class="empty-icon">🐷</div>
         <div class="empty-text">
-          粘贴各平台热榜内容，点击「AI 分析」<br>
-          自动完成 <strong>去重 · 分类 · 选题评分 · 内容角度建议</strong>
+          粘贴热点内容，点击「开始分析」<br>
+          自动完成 <strong>去重 · 分类 · 评分 · 角度建议</strong>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- ── 爆款内容库 Panel ── -->
+  <div class="panel" id="panel-content">
+    <div class="section-title"><span class="icon">💡</span> 近期爆款参考</div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:20px;">收集各平台近期爆款内容，供选题参考。数据每周更新。</p>
+
+    <div class="content-grid">
+      <div class="content-card">
+        <div class="c-platform">🐦 微博 · 热搜榜</div>
+        <div class="c-title">山西煤矿事故82人遇难，安委办挂牌督办</div>
+        <div class="c-data">阅读 <span>8.2亿</span> · 讨论 <span>12.6万</span></div>
+      </div>
+      <div class="content-card">
+        <div class="c-platform">📘 知乎 · 热榜</div>
+        <div class="c-title">如何看待腾讯放弃音频独家版权？对行业有何影响？</div>
+        <div class="c-data">热度 <span>1325万</span> · 回答 <span>847</span></div>
+      </div>
+      <div class="content-card">
+        <div class="c-platform">🎵 抖音 · 热点榜</div>
+        <div class="c-title">英伟达发布量子AI芯片，算力提升100倍</div>
+        <div class="c-data">播放 <span>2.1亿</span> · 点赞 <span>580万</span></div>
+      </div>
+      <div class="content-card">
+        <div class="c-platform">📕 小红书 · 爆款笔记</div>
+        <div class="c-title">月薪3000到3万，我只做对了这3件事</div>
+        <div class="c-data">点赞 <span>8.6万</span> · 收藏 <span>12.3万</span></div>
+      </div>
+      <div class="content-card">
+        <div class="c-platform">📺 B站 · 热门视频</div>
+        <div class="c-title">【原神】5.0版本前瞻直播全程回顾</div>
+        <div class="c-data">播放 <span>680万</span> · 弹幕 <span>4.2万</span></div>
+      </div>
+      <div class="content-card">
+        <div class="c-platform">🌍 Twitter · Trending</div>
+        <div class="c-title">Gaza ceasefire deal reached after 48-hour negotiation</div>
+        <div class="c-data">推文 <span>124万</span> · 趋势 #1</div>
+      </div>
+    </div>
+
+    <div class="analyze-box" style="margin-top:28px;">
+      <div class="analyze-header">💡 使用建议：看到感兴趣的话题，复制标题到「选题分析」里评分，判断值不值得做</div>
     </div>
   </div>
 
   <!-- ── History Panel ── -->
   <div class="panel" id="panel-history">
     <div id="historyArea">
-      <div class="hist-empty">暂无历史记录<br><span style="font-size:12px">每次分析完成后自动保存（本地 localStorage）</span></div>
-    </div>
-  </div>
-
-  <!-- ── Guide Panel ── -->
-  <div class="panel" id="panel-guide">
-    <div class="guide">
-      <div class="guide-step">
-        <div class="guide-step-num">STEP 01</div>
-        <div class="guide-step-title">收集热榜数据</div>
-        <div class="guide-step-body">
-          推荐数据源：<br>
-          · 国内综合：<a href="https://tophub.today" target="_blank">今日热榜 tophub.today</a>（微博/知乎/百度/B站/抖音/小红书全有）<br>
-          · Twitter/X 实时趋势：<a href="https://trends24.in/china/" target="_blank">trends24.in</a><br>
-          · Reddit 全球热帖：<a href="https://reddit.com/r/popular" target="_blank">reddit.com/r/popular</a><br>
-          · YouTube 热门：<a href="https://youtube.com/feed/trending" target="_blank">youtube.com/feed/trending</a>
-        </div>
-      </div>
-      <div class="guide-step">
-        <div class="guide-step-num">STEP 02</div>
-        <div class="guide-step-title">粘贴内容 · 无需整理格式</div>
-        <div class="guide-step-body">
-          把各平台热榜直接复制粘贴进输入框，可以混在一起，AI 会自动识别来源和话题。<br>
-          建议用 <code>【平台名】</code> 标注区分，但不是必须的。
-        </div>
-      </div>
-      <div class="guide-step">
-        <div class="guide-step-num">STEP 03</div>
-        <div class="guide-step-title">读懂分析结果</div>
-        <div class="guide-step-body">
-          每条热点包含：<br>
-          · <strong>选题分 0-100</strong>：传播潜力 × 新颖度 × 受众广度<br>
-          · <strong>平台分布</strong>：哪些平台同时在热<br>
-          · <strong>话题分类</strong>：社会 / 科技 / 娱乐 / 国际 / 财经<br>
-          · <strong>内容角度建议</strong>：具体可以从哪个切入点创作<br>
-          · <strong>国内/国际</strong>标签：快速筛选受众方向
-        </div>
-      </div>
-      <div class="guide-step">
-        <div class="guide-step-num">STEP 04</div>
-        <div class="guide-step-title">历史记录</div>
-        <div class="guide-step-body">
-          每次分析结果自动保存到本地，最多保留 20 条。<br>
-          切换到「历史记录」标签可回溯往期热点，点击任意记录可重新加载。
-        </div>
+      <div class="empty-state">
+        <div class="empty-icon">📁</div>
+        <div class="empty-text">暂无历史记录<br><span style="font-size:12px">每次分析自动保存，最多保留20条</span></div>
       </div>
     </div>
   </div>
 
   <footer>
-    HOTPULSE · 全网热点聚合分析工具 · <span class="free-badge">完全免费版</span><br>
-    数据来源：<a href="https://tophub.today" target="_blank">今日热榜</a> · <a href="https://trends24.in" target="_blank">Trends24</a> · <a href="https://reddit.com" target="_blank">Reddit</a> · 各平台公开热榜
+    猪小媒 · 新媒体热点选题雷达 · 用逻辑选爆款 🐷<br>
+    <span class="heart">❤</span> 完全免费 · 本地存储 · 无需注册
   </footer>
 
 </div>
 
 <script>
 // ── State ──
-const PLATFORMS = ['微博','知乎','百度','B站','抖音','小红书','Twitter/X','Reddit','YouTube'];
-let activePlatforms = new Set(PLATFORMS);
 let activeFilter = 'all';
 let currentResults = null;
 
@@ -387,23 +479,7 @@ document.getElementById('ts').textContent = new Date().toLocaleString('zh-CN', {
   year:'numeric', month:'numeric', day:'numeric',
   hour:'2-digit', minute:'2-digit'
 });
-initPills();
 loadHistoryFromStorage();
-
-function initPills() {
-  const el = document.getElementById('pills');
-  PLATFORMS.forEach(p => {
-    const b = document.createElement('button');
-    b.className = 'pill on';
-    b.textContent = p;
-    b.onclick = () => {
-      if (activePlatforms.has(p)) activePlatforms.delete(p);
-      else activePlatforms.add(p);
-      b.className = 'pill' + (activePlatforms.has(p) ? ' on' : '');
-    };
-    el.appendChild(b);
-  });
-}
 
 // ── Tab switching ──
 function switchTab(t, btn) {
@@ -419,17 +495,16 @@ function clearInput() {
   document.getElementById('rawInput').value = '';
   document.getElementById('resultsArea').innerHTML = `
     <div class="empty-state">
-      <div class="empty-icon">⚡</div>
-      <div class="empty-text">粘贴各平台热榜内容，点击「AI 分析」<br>自动完成 <strong>去重 · 分类 · 选题评分 · 内容角度建议</strong></div>
+      <div class="empty-icon">🐷</div>
+      <div class="empty-text">粘贴热点内容，点击「开始分析」<br>自动完成 <strong>去重 · 分类 · 评分 · 角度建议</strong></div>
     </div>`;
 }
 
-// ── Main analysis ──
-// ── 免费版：本地分析引擎 ──
+// ── Analysis Engine ──
 const CATEGORY_KEYWORDS = {
-  '社会': ['事故','爆炸','火灾','地震','疫情','死亡','遇难','伤亡','失踪','案件','犯罪','抓捕','判刑','离婚','出轨','家暴','霸凌','校园','教育','高考','中考','就业','失业','房价','社保','医保','养老','退休','工资','涨薪','罢工','抗议','游行','政策','法规','法律','出台','禁令','封控','解封','核酸','疫苗','健康码','口罩','防控','救灾','捐款','慈善','贫困','扶贫','低保','拆迁','征地','维权','上访','信访','举报','曝光','揭露','丑闻','绯闻','八卦','明星','网红','主播','带货','打假','造假','掺假','毒','污染','环境','气候','天气','台风','暴雨','洪涝','干旱','高温','寒潮'],
+  '社会': ['事故','爆炸','火灾','地震','疫情','死亡','遇难','伤亡','失踪','案件','犯罪','抓捕','判刑','离婚','出轨','家暴','霸凌','校园','教育','高考','中考','就业','失业','房价','社保','医保','养老','退休','工资','涨薪','罢工','抗议','政策','法规','法律','出台','禁令','封控','解封','核酸','疫苗','健康码','口罩','防控','救灾','捐款','慈善','贫困','扶贫','低保','拆迁','征地','维权','上访','信访','举报','曝光','揭露','丑闻','绯闻','八卦','明星','网红','主播','带货','打假','造假','掺假','毒','污染','环境','气候','天气','台风','暴雨','洪涝','干旱','高温','寒潮'],
   '科技': ['AI','人工智能','GPT','ChatGPT','Claude','大模型','芯片','半导体','英伟达','NVIDIA','苹果','Apple','iPhone','华为','小米','OPPO','vivo','特斯拉','Tesla','SpaceX','马斯克','元宇宙','区块链','比特币','BTC','加密货币','Web3','5G','6G','量子','算力','云计算','开源','APP','算法','推荐系统','自动驾驶','新能源','电池','光伏','卫星','火箭','发射','登月','火星','机器人','脑机接口','VR','AR','MR','折叠屏','智能手表','耳机','电脑','笔记本','显卡','游戏机','PS5','Switch','Steam','游戏','电竞'],
-  '娱乐': ['电影','电视剧','综艺','选秀','偶像','演唱会','音乐','专辑','歌曲','歌手','演员','导演','票房','档期','上映','首映','获奖','提名','奥斯卡','金鸡奖','百花奖','综艺','真人秀','脱口秀','相声','小品','舞蹈','街舞','偶像练习生','创造营','青春有你','浪姐','披荆斩棘','声生不息','歌手','天赐的声音','奔跑吧','极限挑战','向往的生活','中餐厅','亲爱的客栈','花少','旅行','旅游','打卡','美食','探店','吃播','vlog','博主','UP主','种草','测评','开箱','穿搭','美妆','护肤','彩妆','减肥','健身','瑜伽','医美','整容','整形'],
+  '娱乐': ['电影','电视剧','综艺','选秀','偶像','演唱会','音乐','专辑','歌曲','歌手','演员','导演','票房','档期','上映','首映','获奖','提名','奥斯卡','金鸡奖','百花奖','真人秀','脱口秀','相声','小品','舞蹈','街舞','浪姐','披荆斩棘','声生不息','歌手','天赐的声音','奔跑吧','极限挑战','向往的生活','中餐厅','亲爱的客栈','花少','旅行','旅游','打卡','美食','探店','吃播','vlog','博主','UP主','种草','测评','开箱','穿搭','美妆','护肤','彩妆','减肥','健身','瑜伽','医美','整容','整形'],
   '国际': ['美国','中国','俄罗斯','乌克兰','日本','韩国','朝鲜','印度','英国','法国','德国','欧盟','北约','联合国','WHO','WTO','拜登','特朗普','普京','泽连斯基','岸田','尹锡悦','莫迪','马克龙','苏纳克','朔尔茨','战争','冲突','制裁','关税','贸易战','脱钩','峰会','会谈','协议','条约','核武器','导弹','军演','航母','战机','南海','台海','中东','巴以','伊朗','以色列','哈马斯','黎巴嫩','叙利亚','阿富汗','塔利班','选举','总统','首相','议会','公投','独立','政变','革命','示威','罢工','通胀','加息','降息','衰退','央行','美联储','欧央行','日元','汇率','股市','美股','A股','港股','原油','黄金','比特币','ETF'],
   '财经': ['GDP','CPI','PMI','营收','利润','财报','上市','IPO','融资','创投','估值','独角兽','倒闭','破产','裁员','降薪','年终奖','股票','基金','债券','期货','外汇','人民币','美元','欧元','日元','利率','房贷','车贷','消费贷','信用卡','网贷','P2P','理财','保险','银行','券商','私募','公募','养老金','社保','公积金','税收','退税','补贴','发钱','消费','零售','电商','淘宝','天猫','京东','拼多多','抖音电商','直播带货','双11','618','购物节','促销','打折','优惠','涨价','降价','成本','供应链','物流','快递','外卖','美团','饿了么','滴滴','Uber','网约车','共享单车','共享充电宝'],
   '生活': ['美食','菜谱','食谱','做饭','家常菜','甜品','饮料','咖啡','奶茶','火锅','烧烤','自助餐','日料','西餐','快餐','肯德基','麦当劳','星巴克','瑞幸','蜜雪冰城','宠物','猫','狗','猫咪','狗狗','养宠','铲屎官','装修','家居','家具','家电','空调','冰箱','洗衣机','电视','扫地机器人','空气净化器','净水器','出行','旅游','机票','酒店','民宿','自驾','高铁','飞机','火车','地铁','公交','打车','租车','买车','考驾照','堵车','停车','违章','年检','加油','充电桩','电动车','摩托车','自行车','露营','徒步','登山','钓鱼','摄影','拍照','手机摄影','剪辑','视频','短视频','直播','网红','博主','UP主','种草','穿搭','时尚','潮流','球鞋','限量','联名','潮牌','奢侈品','GUCCI','LV','爱马仕','香奈儿','DIOR'],
@@ -452,35 +527,28 @@ function detectCategory(title) {
 }
 
 function detectRegion(title) {
-  const cnIndicators = ['中国','国内','全国','北京','上海','广州','深圳','杭州','成都','武汉','西安','重庆','南京','天津','苏州','长沙','郑州','东莞','青岛','大连','厦门','宁波','无锡','合肥','佛山','福州','济南','哈尔滨','长春','沈阳','太原','石家庄','南昌','昆明','贵阳','南宁','海口','兰州','银川','西宁','呼和浩特','乌鲁木齐','拉萨','台湾','香港','澳门','央视','人民日报','新华社','光明日报','经济日报','微博热搜','知乎热榜','百度热搜','B站热门','抖音热点','小红书','豆瓣','虎扑','懂球帝'];
-  const intlIndicators = ['US','USA','UK','EU','UN','NATO','WHO','WTO','NASA','FBI','CIA','NSA','White House','Pentagon','Kremlin','Downing Street','Elysee Palace','Biden','Trump','Putin','Zelenskyy','Netanyahu','Starmer','Macron','Scholz','Meloni','Kishida','Yoon','Modi','America','British','European','Russian','Ukrainian','Japanese','Korean','Indian','Middle East','Latin America','Africa','Southeast Asia','Nordic','Scandinavian','Baltic','Caucasus','Caribbean','Pacific','Atlantic','Arctic','Antarctic','Global','Worldwide','International','Twitter','Reddit','Trending','Viral','BBC','CNN','Reuters','AP','AFP','Bloomberg','WSJ','NYT','Washington Post','The Guardian','Al Jazeera','France24','DW','NHK','KBS','ABC','CBS','NBC','Fox News','MSNBC','CNBC','Forbes','Fortune','TechCrunch','The Verge','Wired','Ars Technica','Engadget','Gizmodo','Mashable','BuzzFeed','HuffPost','Vox','Politico','Economist','Financial Times','Nikkei','South China Morning Post',' Straits Times','India Times','Times of Israel','Jerusalem Post','Haaretz','Al Arabiya','Al Jazeera','TRT World','CGTN','RT','Sputnik','TASS','Itar-Tass','Interfax','RIA Novosti','Xinhua','Kyodo','Yonhap','Central News Agency','Anadolu','DPA','APA','CTK','MTI','TASR','BTA','Moldpress','Agerpres','ACTMedia','MLADA','BTA'];
+  const cnIndicators = ['中国','国内','全国','北京','上海','广州','深圳','杭州','成都','武汉','西安','重庆','南京','天津','苏州','长沙','郑州','东莞','青岛','大连','厦门','宁波','无锡','合肥','佛山','福州','济南','哈尔滨','长春','沈阳','太原','石家庄','南昌','昆明','贵阳','南宁','海口','兰州','银川','西宁','呼和浩特','乌鲁木齐','拉萨','台湾','香港','澳门','央视','人民日报','新华社','微博热搜','知乎热榜','百度热搜','B站热门','抖音热点','小红书','豆瓣','虎扑'];
+  const intlIndicators = ['US','USA','UK','EU','UN','NATO','WHO','WTO','NASA','FBI','CIA','America','British','European','Russian','Ukrainian','Japanese','Korean','Indian','Middle East','Global','World','Twitter','Reddit','Trending','BBC','CNN','Reuters'];
   let cn = 0, intl = 0;
   for (const kw of cnIndicators) { if (title.includes(kw)) cn++; }
   for (const kw of intlIndicators) { if (title.includes(kw)) intl++; }
   if (cn > 0 && intl > 0) return 'both';
   if (cn > 0) return 'cn';
   if (intl > 0) return 'intl';
-  // 默认根据平台判断
   return 'cn';
 }
 
 function calcScore(topic, rank, platformCount) {
-  let score = 50; // 基础分
-  // 排名加分
+  let score = 50;
   score += Math.max(0, 15 - rank * 0.5);
-  // 平台覆盖加分
   score += platformCount * 6;
-  // 高价值关键词加分
   for (const kw of HIGH_VALUE_KEYWORDS) {
     if (topic.title.includes(kw)) { score += 4; break; }
   }
-  // 分类加成
   const cat = topic.category;
   if (cat === '科技' || cat === '财经') score += 5;
   else if (cat === '社会' || cat === '国际') score += 3;
-  // 区域加成
   if (topic.region === 'both') score += 5;
-  // 热度词加成
   if (topic.heat === '高') score += 8;
   else if (topic.heat === '中') score += 4;
   return Math.min(99, Math.max(25, Math.round(score)));
@@ -520,22 +588,17 @@ function detectHeat(title, rank) {
   return '低';
 }
 
-// 解析原始文本为话题列表
 function parseRawTopics(raw) {
   const topics = [];
   const lines = raw.split(/\n/).map(l => l.trim()).filter(l => l.length > 0);
   
   for (const line of lines) {
-    // 匹配各种格式：1. xxx  |  1、xxx  |  【xxx】xxx  |  xxx（数字热度）
     let match = line.match(/^(?:\d+[\.、\)\]]\s*|【[^】]+】\s*)?(.+?)(?:\s*[\|\s]+\d+(?:万|亿)?(?:热度|阅读|点赞|评论)?)?$/);
     if (match && match[1]) {
       let title = match[1].trim();
-      // 清理标题
       title = title.replace(/^[\d+\.、\)\]\s]+/, '').trim();
       title = title.replace(/^【[^】]+】\s*/, '').trim();
-      // 过滤太短或无意义的内容
       if (title.length >= 4 && !/^\d+$/.test(title)) {
-        // 检测来源平台
         let platforms = [];
         if (line.match(/微博|weibo/i)) platforms.push('微博');
         if (line.match(/知乎|zhihu/i)) platforms.push('知乎');
@@ -547,13 +610,11 @@ function parseRawTopics(raw) {
         if (line.match(/reddit|r\//i)) platforms.push('Reddit');
         if (line.match(/youtube|yt/i)) platforms.push('YouTube');
         if (platforms.length === 0) platforms = ['未知'];
-        
         topics.push({ rawTitle: title, platforms, rawLine: line });
       }
     }
   }
   
-  // 去重：相似标题合并
   const merged = [];
   const seen = new Set();
   for (const t of topics) {
@@ -567,7 +628,6 @@ function parseRawTopics(raw) {
       merged.push(t);
     }
   }
-  
   return merged;
 }
 
@@ -582,30 +642,23 @@ async function runAnalysis() {
   const area = document.getElementById('resultsArea');
   area.innerHTML = `<div class="loading-box"><div class="spinner"></div><div class="loading-text">正在解析热点数据<br>识别话题 · 去重合并 · 评分排序<br>约需 3-5 秒…</div></div>`;
 
-  // 用 setTimeout 模拟异步，让 UI 有机会更新
   await new Promise(r => setTimeout(r, 800));
 
   try {
     const parsedTopics = parseRawTopics(raw);
     
     if (parsedTopics.length === 0) {
-      area.innerHTML = `<div class="error-box">
-        ⚠️ 未能识别到有效话题<br><br>
-        请检查粘贴内容是否包含具体的热榜条目<br>
-        支持格式：「1. 话题名称」或「【平台名】1. 话题」
-      </div>`;
+      area.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">未能识别到有效话题<br>请检查粘贴内容格式</div></div>`;
       btn.disabled = false;
-      btn.textContent = '✦ AI 分析';
+      btn.textContent = '✦ 开始分析';
       return;
     }
 
-    // 构建结果
     const resultTopics = parsedTopics.map((t, idx) => {
       const category = detectCategory(t.rawTitle);
       const region = detectRegion(t.rawTitle);
       const heat = detectHeat(t.rawTitle, idx + 1);
       const score = calcScore({ title: t.rawTitle, category, region, heat }, idx + 1, t.platforms.length);
-      
       return {
         rank: idx + 1,
         title: t.rawTitle,
@@ -619,9 +672,7 @@ async function runAnalysis() {
       };
     });
 
-    // 按 score 排序
     resultTopics.sort((a, b) => b.score - a.score);
-    // 更新排名
     resultTopics.forEach((t, i) => t.rank = i + 1);
 
     const result = {
@@ -634,32 +685,28 @@ async function runAnalysis() {
     saveToStorage(result, raw);
 
   } catch (e) {
-    area.innerHTML = `<div class="error-box">
-      ⚠️ 分析出错：${e.message}<br><br>
-      请刷新页面后重试
-    </div>`;
+    area.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">分析出错：${e.message}<br>请刷新页面后重试</div></div>`;
   }
 
   btn.disabled = false;
-  btn.textContent = '✦ AI 分析';
+  btn.textContent = '✦ 开始分析';
 }
 
-// ── Render results ──
+// ── Render ──
 function scoreColor(s) {
-  if (s >= 75) return 's-high';
-  if (s >= 50) return 's-mid';
-  return 's-low';
+  if (s >= 75) return 'score-high';
+  if (s >= 50) return 'score-mid';
+  return 'score-low';
 }
 
 function regionTag(r) {
-  if (r === 'cn')   return '<span class="tag cn">🇨🇳 国内</span>';
-  if (r === 'intl') return '<span class="tag intl">🌍 国际</span>';
-  return '<span class="tag cn">🇨🇳 国内</span><span class="tag intl">🌍 国际</span>';
+  if (r === 'cn')   return '<span class="tag tag-pink">🇨🇳 国内</span>';
+  if (r === 'intl') return '<span class="tag tag-orange">🌍 国际</span>';
+  return '<span class="tag tag-pink">🇨🇳 国内</span><span class="tag tag-orange">🌍 国际</span>';
 }
 
 function catTag(c) {
-  const map = { 社会:'social', 科技:'tech', 娱乐:'ent', 国际:'intl', 财经:'social', 生活:'social', 体育:'ent' };
-  return `<span class="tag ${map[c]||'src'}">${c}</span>`;
+  return `<span class="tag tag-gray">${c}</span>`;
 }
 
 function renderResults(data, filter) {
@@ -686,7 +733,7 @@ function renderResults(data, filter) {
   </div>`;
 
   if (data.summary) {
-    html += `<div class="summary-bar">📡 <strong>今日热点速览：</strong>${data.summary}</div>`;
+    html += `<div class="analyze-box" style="padding:16px 20px;font-size:13px;"><strong>📡 今日热点速览：</strong>${data.summary}</div>`;
   }
 
   if (topics.length === 0) {
@@ -695,7 +742,7 @@ function renderResults(data, filter) {
     html += `<div class="topic-list">`;
     topics.forEach((t, i) => {
       const sc = scoreColor(t.score);
-      const plat = (t.platforms || []).map(p => `<span class="tag src">${p}</span>`).join('');
+      const plat = (t.platforms || []).map(p => `<span class="tag tag-gray">${p}</span>`).join('');
       html += `
       <div class="topic-card">
         <div class="card-top">
@@ -742,13 +789,13 @@ function saveToStorage(data, raw) {
       data
     });
     if (history.length > 20) history.splice(20);
-    localStorage.setItem('hotpulse_history', JSON.stringify(history));
+    localStorage.setItem('zhuxiaomei_history', JSON.stringify(history));
   } catch(e) {}
 }
 
 function getHistory() {
   try {
-    return JSON.parse(localStorage.getItem('hotpulse_history') || '[]');
+    return JSON.parse(localStorage.getItem('zhuxiaomei_history') || '[]');
   } catch(e) { return []; }
 }
 
@@ -758,20 +805,17 @@ function renderHistory() {
   const area = document.getElementById('historyArea');
   const history = getHistory();
   if (!history.length) {
-    area.innerHTML = `<div class="hist-empty">暂无历史记录<br><span style="font-size:12px">每次分析完成后自动保存到本地，最多保留20条</span></div>`;
+    area.innerHTML = `<div class="empty-state"><div class="empty-icon">📁</div><div class="empty-text">暂无历史记录<br><span style="font-size:12px">每次分析自动保存，最多保留20条</span></div></div>`;
     return;
   }
   area.innerHTML = history.map((h, i) => `
     <div class="hist-card" onclick="loadHistory(${i})">
-      <div style="text-align:center">
-        <div class="hist-count">${h.count}</div>
-        <div class="hist-count-label">条热点</div>
-      </div>
-      <div style="flex:1">
+      <div class="hist-count">${h.count}</div>
+      <div class="hist-info">
         <div class="hist-date">${h.time}</div>
         <div class="hist-preview">${h.summary || '—'}</div>
       </div>
-      <div style="font-size:12px;color:var(--muted)">点击加载 →</div>
+      <div class="hist-tip">点击加载 →</div>
     </div>
   `).join('');
 }
@@ -782,11 +826,10 @@ function loadHistory(i) {
   document.getElementById('rawInput').value = h.raw;
   currentResults = h.data;
 
-  // Switch to analyze tab
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('panel-analyze').classList.add('active');
-  document.querySelectorAll('.tab-btn')[0].classList.add('active');
+  document.querySelectorAll('.tab-btn')[1].classList.add('active');
 
   renderResults(h.data, 'all');
 }
