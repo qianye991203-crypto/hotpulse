@@ -1,4 +1,43 @@
-<!DOCTYPE html>
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+猪小媒 v9 - 完整修复版
+一次性重写整个文件，确保所有panel内容完整、排版优化
+"""
+import sys, io, re, subprocess, json
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+
+with open(r'C:\Users\VRPC01\.qclaw\workspace\hotpulse\index.html', 'r', encoding='utf-8') as f:
+    content = f.read()
+
+# Extract hotlist-merged HTML (the 100 items)
+merged_start = content.find('<!-- 全网热点合并列表')
+if merged_start == -1:
+    merged_start = content.find('hotlist-merged')
+merged_block = ''
+if merged_start > -1:
+    depth = 0
+    me = merged_start
+    for i in range(merged_start, len(content)):
+        if content[i:i+4] == '<div':
+            j = i+4
+            while j < len(content) and content[j] in ' \t\n\r ': j+=1
+            if j < len(content) and content[j] not in '/>': depth += 1
+        elif content[i:i+6] == '</div>':
+            depth -= 1
+            if depth == 0:
+                me = i + 6
+                break
+    merged_block = content[merged_start:me]
+    print(f'Extracted hotlist: {len(merged_block)} bytes')
+else:
+    print('WARNING: No hotlist block found!')
+
+# Build complete new HTML file as a Python string
+new_html_parts = []
+
+# ======================== HTML HEAD + CSS ========================
+new_html_parts.append(r'''<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -158,7 +197,10 @@ footer .heart{color:var(--accent)}
 </div>
 
 <div class="container">
+''')
 
+# ======================== PANEL: 平台热点 ========================
+new_html_parts.append(r'''
 <div class="panel active" id="panel-hot">
   <div class="section-title"><span class="icon">📡</span> 全网热点 TOP100 · 实时聚合</div>
 
@@ -177,122 +219,23 @@ footer .heart{color:var(--accent)}
   </div>
 
   <!-- 100条热点列表 -->
-<!-- 全网热点合并列表 (纯静态HTML · 100条) -->
-  <div class="hotlist-merged">
-    <div class="hotlist-merged-title"><span>🔥</span> 全网热点 TOP100 · 实时聚合（按热度排列）<span style="font-size:11px;color:var(--muted);font-weight:400;margin-left:8px;" id="update-time">· 更新时间：2026-05-29 08:00</span></div>
-    <div class="hotlist-merged-grid">
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank top">01</span><span class="hotlist-merged-title-text">外交部回应美方涉华言论</span><span class="hotlist-merged-platform">微博</span><span class="hotlist-merged-heat">892万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank top">02</span><span class="hotlist-merged-title-text">全国多地高温预警</span><span class="hotlist-merged-platform">微博</span><span class="hotlist-merged-heat">756万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank top">03</span><span class="hotlist-merged-title-text">如何看待当前经济形势？</span><span class="hotlist-merged-platform">知乎</span><span class="hotlist-merged-heat">2856万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank hot">04</span><span class="hotlist-merged-title-text">嫦娥六号任务进展</span><span class="hotlist-merged-platform">微博</span><span class="hotlist-merged-heat">623万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank hot">05</span><span class="hotlist-merged-title-text">AI对就业市场的真实影响</span><span class="hotlist-merged-platform">知乎</span><span class="hotlist-merged-heat">2134万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank hot">06</span><span class="hotlist-merged-title-text">#外交部回应# 热议中</span><span class="hotlist-merged-platform">抖音</span><span class="hotlist-merged-heat">987万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank hot">07</span><span class="hotlist-merged-title-text">新能源汽车出口创新高</span><span class="hotlist-merged-platform">微博</span><span class="hotlist-merged-heat">512万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank hot">08</span><span class="hotlist-merged-title-text">年轻人为什么不愿意结婚了？</span><span class="hotlist-merged-platform">知乎</span><span class="hotlist-merged-heat">1876万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank hot">09</span><span class="hotlist-merged-title-text">挑战类视频又火了</span><span class="hotlist-merged-platform">抖音</span><span class="hotlist-merged-heat">876万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank hot">10</span><span class="hotlist-merged-title-text">【年度盘点】2025最火视频合集</span><span class="hotlist-merged-platform">B站</span><span class="hotlist-merged-heat">1234万播放</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">11</span><span class="hotlist-merged-title-text">A股三大指数收涨</span><span class="hotlist-merged-platform">微博</span><span class="hotlist-merged-heat">489万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">12</span><span class="hotlist-merged-title-text">有哪些值得一看的纪录片推荐？</span><span class="hotlist-merged-platform">知乎</span><span class="hotlist-merged-heat">1523万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">13</span><span class="hotlist-merged-title-text">某网红翻车现场</span><span class="hotlist-merged-platform">抖音</span><span class="hotlist-merged-heat">765万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">14</span><span class="hotlist-merged-title-text">UP主实测新款手机</span><span class="hotlist-merged-platform">B站</span><span class="hotlist-merged-heat">987万播放</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">15</span><span class="hotlist-merged-title-text">夏日穿搭灵感｜这5套绝了！</span><span class="hotlist-merged-platform">小红书</span><span class="hotlist-merged-heat">45.6万收藏</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">16</span><span class="hotlist-merged-title-text">知名演员去世</span><span class="hotlist-merged-platform">微博</span><span class="hotlist-merged-heat">398万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">17</span><span class="hotlist-merged-title-text">如何提高工作效率？</span><span class="hotlist-merged-platform">知乎</span><span class="hotlist-merged-heat">1298万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">18</span><span class="hotlist-merged-title-text">这个舞蹈太上头了</span><span class="hotlist-merged-platform">抖音</span><span class="hotlist-merged-heat">654万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">19</span><span class="hotlist-merged-title-text">这部纪录片值得一看</span><span class="hotlist-merged-platform">B站</span><span class="hotlist-merged-heat">876万播放</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">20</span><span class="hotlist-merged-title-text">平价好物分享｜学生党必看</span><span class="hotlist-merged-platform">小红书</span><span class="hotlist-merged-heat">38.2万收藏</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">21</span><span class="hotlist-merged-title-text">某地突发地震</span><span class="hotlist-merged-platform">微博</span><span class="hotlist-merged-heat">356万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">22</span><span class="hotlist-merged-title-text">为什么越来越多人选择躺平？</span><span class="hotlist-merged-platform">知乎</span><span class="hotlist-merged-heat">1145万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">23</span><span class="hotlist-merged-title-text">美食博主挑战黑暗料理</span><span class="hotlist-merged-platform">抖音</span><span class="hotlist-merged-heat">543万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">24</span><span class="hotlist-merged-title-text">游戏实况全程高能</span><span class="hotlist-merged-platform">B站</span><span class="hotlist-merged-heat">765万播放</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">25</span><span class="hotlist-merged-title-text">减肥食谱｜一周瘦5斤</span><span class="hotlist-merged-platform">小红书</span><span class="hotlist-merged-heat">31.4万收藏</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">26</span><span class="hotlist-merged-title-text">网红主播被罚</span><span class="hotlist-merged-platform">微博</span><span class="hotlist-merged-heat">312万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">27</span><span class="hotlist-merged-title-text">2025年最值得投资的领域是什么？</span><span class="hotlist-merged-platform">知乎</span><span class="hotlist-merged-heat">1023万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">28</span><span class="hotlist-merged-title-text">萌宠日常治愈瞬间</span><span class="hotlist-merged-platform">抖音</span><span class="hotlist-merged-heat">432万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">29</span><span class="hotlist-merged-title-text">科技评测深度解析</span><span class="hotlist-merged-platform">B站</span><span class="hotlist-merged-heat">654万播放</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">30</span><span class="hotlist-merged-title-text">护肤心得｜亲测有效</span><span class="hotlist-merged-platform">小红书</span><span class="hotlist-merged-heat">27.8万收藏</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">31</span><span class="hotlist-merged-title-text">教育部发布新政策</span><span class="hotlist-merged-platform">微博</span><span class="hotlist-merged-heat">298万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">32</span><span class="hotlist-merged-title-text">如何评价某部新上映的电影？</span><span class="hotlist-merged-platform">知乎</span><span class="hotlist-merged-heat">912万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">33</span><span class="hotlist-merged-title-text">旅行vlog惊艳全网</span><span class="hotlist-merged-platform">抖音</span><span class="hotlist-merged-heat">321万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">34</span><span class="hotlist-merged-title-text">动画新作口碑炸裂</span><span class="hotlist-merged-platform">B站</span><span class="hotlist-merged-heat">543万播放</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">35</span><span class="hotlist-merged-title-text">家居改造｜小户型大变身</span><span class="hotlist-merged-platform">小红书</span><span class="hotlist-merged-heat">24.2万收藏</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">36</span><span class="hotlist-merged-title-text">某明星官宣恋情</span><span class="hotlist-merged-platform">微博</span><span class="hotlist-merged-heat">276万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">37</span><span class="hotlist-merged-title-text">远程办公会成为常态吗？</span><span class="hotlist-merged-platform">知乎</span><span class="hotlist-merged-heat">801万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">38</span><span class="hotlist-merged-title-text">变装视频又出新花样</span><span class="hotlist-merged-platform">抖音</span><span class="hotlist-merged-heat">210万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">39</span><span class="hotlist-merged-title-text">音乐区神仙打架</span><span class="hotlist-merged-platform">B站</span><span class="hotlist-merged-heat">432万播放</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">40</span><span class="hotlist-merged-title-text">旅行攻略｜小众目的地</span><span class="hotlist-merged-platform">小红书</span><span class="hotlist-merged-heat">20.6万收藏</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">41</span><span class="hotlist-merged-title-text">全国房价最新数据</span><span class="hotlist-merged-platform">微博</span><span class="hotlist-merged-heat">254万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">42</span><span class="hotlist-merged-title-text">普通人如何通过副业增加收入？</span><span class="hotlist-merged-platform">知乎</span><span class="hotlist-merged-heat">690万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">43</span><span class="hotlist-merged-title-text">搞笑段子合集</span><span class="hotlist-merged-platform">抖音</span><span class="hotlist-merged-heat">198万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">44</span><span class="hotlist-merged-title-text">知识区硬核科普</span><span class="hotlist-merged-platform">B站</span><span class="hotlist-merged-heat">321万播放</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">45</span><span class="hotlist-merged-title-text">职场穿搭｜通勤必备</span><span class="hotlist-merged-platform">小红书</span><span class="hotlist-merged-heat">18.0万收藏</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">46</span><span class="hotlist-merged-title-text">医保改革新动向</span><span class="hotlist-merged-platform">微博</span><span class="hotlist-merged-heat">231万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">47</span><span class="hotlist-merged-title-text">为什么现在的年轻人都不爱买房了？</span><span class="hotlist-merged-platform">知乎</span><span class="hotlist-merged-heat">589万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">48</span><span class="hotlist-merged-title-text">健身打卡第100天</span><span class="hotlist-merged-platform">抖音</span><span class="hotlist-merged-heat">187万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">49</span><span class="hotlist-merged-title-text">美食区馋哭网友</span><span class="hotlist-merged-platform">B站</span><span class="hotlist-merged-heat">210万播放</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">50</span><span class="hotlist-merged-title-text">美食教程｜零失败配方</span><span class="hotlist-merged-platform">小红书</span><span class="hotlist-merged-heat">15.4万收藏</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">51</span><span class="hotlist-merged-title-text">某地暴雨预警</span><span class="hotlist-merged-platform">微博</span><span class="hotlist-merged-heat">209万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">52</span><span class="hotlist-merged-title-text">AI写作工具对内容创作者的影响？</span><span class="hotlist-merged-platform">知乎</span><span class="hotlist-merged-heat">478万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">53</span><span class="hotlist-merged-title-text">开箱测评新款手机</span><span class="hotlist-merged-platform">抖音</span><span class="hotlist-merged-heat">176万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">54</span><span class="hotlist-merged-title-text">鬼畜区年度最佳</span><span class="hotlist-merged-platform">B站</span><span class="hotlist-merged-heat">198万播放</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">55</span><span class="hotlist-merged-title-text">健身计划｜新手友好</span><span class="hotlist-merged-platform">小红书</span><span class="hotlist-merged-heat">12.8万收藏</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">56</span><span class="hotlist-merged-title-text">航天员返回地球</span><span class="hotlist-merged-platform">微博</span><span class="hotlist-merged-heat">187万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">57</span><span class="hotlist-merged-title-text">如何看待短视频平台的崛起？</span><span class="hotlist-merged-platform">知乎</span><span class="hotlist-merged-heat">367万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">58</span><span class="hotlist-merged-title-text">手工DIY教程火了</span><span class="hotlist-merged-platform">抖音</span><span class="hotlist-merged-heat">165万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">59</span><span class="hotlist-merged-title-text">生活区UP主日常</span><span class="hotlist-merged-platform">B站</span><span class="hotlist-merged-heat">187万播放</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">60</span><span class="hotlist-merged-title-text">学习笔记｜高效方法</span><span class="hotlist-merged-platform">小红书</span><span class="hotlist-merged-heat">10.2万收藏</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">61</span><span class="hotlist-merged-title-text">国产芯片突破</span><span class="hotlist-merged-platform">微博</span><span class="hotlist-merged-heat">165万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">62</span><span class="hotlist-merged-title-text">新能源汽车到底值不值得买？</span><span class="hotlist-merged-platform">知乎</span><span class="hotlist-merged-heat">256万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">63</span><span class="hotlist-merged-title-text">农村生活记录</span><span class="hotlist-merged-platform">抖音</span><span class="hotlist-merged-heat">154万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">64</span><span class="hotlist-merged-title-text">舞蹈区神仙舞台</span><span class="hotlist-merged-platform">B站</span><span class="hotlist-merged-heat">176万播放</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">65</span><span class="hotlist-merged-title-text">美妆教程｜日常妆容</span><span class="hotlist-merged-platform">小红书</span><span class="hotlist-merged-heat">9.6万收藏</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">66</span><span class="hotlist-merged-title-text">某品牌翻车事件</span><span class="hotlist-merged-platform">微博</span><span class="hotlist-merged-heat">143万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">67</span><span class="hotlist-merged-title-text">如何培养孩子的自主学习能力？</span><span class="hotlist-merged-platform">知乎</span><span class="hotlist-merged-heat">145万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">68</span><span class="hotlist-merged-title-text">知识科普类视频爆火</span><span class="hotlist-merged-platform">抖音</span><span class="hotlist-merged-heat">143万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">69</span><span class="hotlist-merged-title-text">影视区深度解析</span><span class="hotlist-merged-platform">B站</span><span class="hotlist-merged-heat">165万播放</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">70</span><span class="hotlist-merged-title-text">摄影技巧｜手机出大片</span><span class="hotlist-merged-platform">小红书</span><span class="hotlist-merged-heat">8.0万收藏</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">71</span><span class="hotlist-merged-title-text">春运购票开启</span><span class="hotlist-merged-platform">微博</span><span class="hotlist-merged-heat">121万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">72</span><span class="hotlist-merged-title-text">职场中如何与难相处的同事相处？</span><span class="hotlist-merged-platform">知乎</span><span class="hotlist-merged-heat">134万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">73</span><span class="hotlist-merged-title-text">情感语录合集</span><span class="hotlist-merged-platform">抖音</span><span class="hotlist-merged-heat">132万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">74</span><span class="hotlist-merged-title-text">数码区开箱体验</span><span class="hotlist-merged-platform">B站</span><span class="hotlist-merged-heat">154万播放</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">75</span><span class="hotlist-merged-title-text">读书推荐｜本月书单</span><span class="hotlist-merged-platform">小红书</span><span class="hotlist-merged-heat">6.4万收藏</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">76</span><span class="hotlist-merged-title-text">高考倒计时</span><span class="hotlist-merged-platform">微博</span><span class="hotlist-merged-heat">109万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">77</span><span class="hotlist-merged-title-text">2025年互联网行业趋势预测</span><span class="hotlist-merged-platform">知乎</span><span class="hotlist-merged-heat">123万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">78</span><span class="hotlist-merged-title-text">游戏精彩操作集锦</span><span class="hotlist-merged-platform">抖音</span><span class="hotlist-merged-heat">121万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">79</span><span class="hotlist-merged-title-text">运动区极限挑战</span><span class="hotlist-merged-platform">B站</span><span class="hotlist-merged-heat">143万播放</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">80</span><span class="hotlist-merged-title-text">理财入门｜存钱妙招</span><span class="hotlist-merged-platform">小红书</span><span class="hotlist-merged-heat">4.8万收藏</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">81</span><span class="hotlist-merged-title-text">某综艺开播</span><span class="hotlist-merged-platform">微博</span><span class="hotlist-merged-heat">98万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">82</span><span class="hotlist-merged-title-text">为什么越来越多的人开始关注心理健康？</span><span class="hotlist-merged-platform">知乎</span><span class="hotlist-merged-heat">112万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">83</span><span class="hotlist-merged-title-text">穿搭分享获赞无数</span><span class="hotlist-merged-platform">抖音</span><span class="hotlist-merged-heat">110万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">84</span><span class="hotlist-merged-title-text">动物区治愈时刻</span><span class="hotlist-merged-platform">B站</span><span class="hotlist-merged-heat">132万播放</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">85</span><span class="hotlist-merged-title-text">租房改造｜低成本焕新</span><span class="hotlist-merged-platform">小红书</span><span class="hotlist-merged-heat">3.2万收藏</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">86</span><span class="hotlist-merged-title-text">国际局势最新动态</span><span class="hotlist-merged-platform">微博</span><span class="hotlist-merged-heat">87万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">87</span><span class="hotlist-merged-title-text">自由职业真的比上班好吗？</span><span class="hotlist-merged-platform">知乎</span><span class="hotlist-merged-heat">101万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">88</span><span class="hotlist-merged-title-text">厨艺展示令人惊叹</span><span class="hotlist-merged-platform">抖音</span><span class="hotlist-merged-heat">99万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">89</span><span class="hotlist-merged-title-text">手工区大神作品</span><span class="hotlist-merged-platform">B站</span><span class="hotlist-merged-heat">121万播放</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">90</span><span class="hotlist-merged-title-text">早餐灵感｜一周不重样</span><span class="hotlist-merged-platform">小红书</span><span class="hotlist-merged-heat">2.6万收藏</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">91</span><span class="hotlist-merged-title-text">如何建立个人品牌？</span><span class="hotlist-merged-platform">知乎</span><span class="hotlist-merged-heat">90万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">92</span><span class="hotlist-merged-title-text">宠物搞笑瞬间</span><span class="hotlist-merged-platform">抖音</span><span class="hotlist-merged-heat">88万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">93</span><span class="hotlist-merged-title-text">汽车区试驾报告</span><span class="hotlist-merged-platform">B站</span><span class="hotlist-merged-heat">110万播放</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">94</span><span class="hotlist-merged-title-text">送礼指南｜贴心实用</span><span class="hotlist-merged-platform">小红书</span><span class="hotlist-merged-heat">2.0万收藏</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">95</span><span class="hotlist-merged-title-text">旅行攻略干货满满</span><span class="hotlist-merged-platform">抖音</span><span class="hotlist-merged-heat">77万</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">96</span><span class="hotlist-merged-title-text">时尚区穿搭指南</span><span class="hotlist-merged-platform">B站</span><span class="hotlist-merged-heat">99万播放</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">97</span><span class="hotlist-merged-title-text">发型教程｜简单易学</span><span class="hotlist-merged-platform">小红书</span><span class="hotlist-merged-heat">1.4万收藏</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">98</span><span class="hotlist-merged-title-text">番剧区新番点评</span><span class="hotlist-merged-platform">B站</span><span class="hotlist-merged-heat">88万播放</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">99</span><span class="hotlist-merged-title-text">收纳技巧｜空间翻倍</span><span class="hotlist-merged-platform">小红书</span><span class="hotlist-merged-heat">1.0万收藏</span></div>
-      <div class="hotlist-merged-item"><span class="hotlist-merged-rank ">100</span><span class="hotlist-merged-title-text">约会妆容｜斩男必备</span><span class="hotlist-merged-platform">小红书</span><span class="hotlist-merged-heat">0.8万收藏</span></div>
-    </div>
-    <div style="margin-top:14px;text-align:center;font-size:11px;color:var(--muted);">
-      💡 每日08:00自动更新 · 数据来源：微博/知乎/抖音/B站/小红书
-    </div>
-  </div>
+''')
 
+if merged_block:
+    new_html_parts.append(merged_block + '\n')
+else:
+    new_html_parts.append('<div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-text">热点数据加载中...</div></div>\n')
+
+new_html_parts.append(r'''
   <div style="margin-top:18px;background:var(--card-bg);border-radius:12px;border:1.5px solid var(--border);padding:14px 18px;">
     <strong style="color:var(--accent);font-size:13px;">💡 小技巧：</strong>
     <span style="font-size:12px;color:#666;">看到感兴趣的话题？复制标题 → 切到「📊 选题分析」评分 → 看看值不值得做！</span>
   </div>
 </div>
+''')
 
+# ======================== PANEL: 选题分析 ========================
+new_html_parts.append(r'''
 <div class="panel" id="panel-analyze">
   <div class="section-title"><span class="icon">🔬</span> 选题热度分析</div>
 
@@ -332,7 +275,10 @@ footer .heart{color:var(--accent)}
     <div id="riskArea"></div>
   </div>
 </div>
+''')
 
+# ======================== PANEL: 爆款内容库 ========================
+new_html_parts.append(r'''
 <div class="panel" id="panel-content">
   <div class="section-title"><span class="icon">💡</span> 近期爆款参考案例</div>
   <p style="font-size:13px;color:var(--muted);margin-bottom:18px;">精选各平台近期爆款，拆解成功要素找灵感 🎯</p>
@@ -388,7 +334,10 @@ footer .heart{color:var(--accent)}
     </div>
   </div>
 </div>
+''')
 
+# ======================== PANEL: 历史记录 ========================
+new_html_parts.append(r'''
 <div class="panel" id="panel-history">
   <div class="section-title"><span class="icon">📁</span> 分析历史记录</div>
   <div id="historyArea">
@@ -398,13 +347,21 @@ footer .heart{color:var(--accent)}
     </div>
   </div>
 </div>
-</div><!-- end container -->
+''')
 
+# Close container
+new_html_parts.append('</div><!-- end container -->\n')
+
+# Footer
+new_html_parts.append(r'''
 <footer>
   <p>🐷 猪小媒 · 新媒体热点选题雷达 · 帮你找爆款方向</p>
   <p style="margin-top:6px">Made with <span class="heart">♥</span> · 数据来源：微博/知乎/抖音/B站/小红书 · 每日08:00更新</p>
 </footer>
-<script>
+''')
+
+# ======================== JAVASCRIPT ========================
+js_code = r'''<script>
 // Date
 document.getElementById('currentDate').textContent = new Date().toLocaleDateString('zh-CN',{year:'numeric',month:'2-digit',day:'2-digit',weekday:'short'});
 
@@ -524,47 +481,47 @@ function calcScore(topic, platform, contentType) {
   var t = topic.toLowerCase();
 
   // D1: 时效性
-  var timeliness = 50;
-  ['刚刚','今日','最新','突发','官宣','确认','回应','曝光','爆料','首例','首次','2026','今年','本月','本周','重磅','连夜','紧急','正式','独家','实锤'].forEach(function(w){
+  var timeliness = 40;
+  ['刚刚','今日','最新','突发','官宣','确认','回应','曝光','爆料','首例','首次','2026','今年','本月','本周'].forEach(function(w){
     if (t.indexOf(w) !== -1) timeliness += 8;
   });
   timeliness = Math.min(timeliness, 100);
 
   // D2: 讨论延展性
-  var discuss = 40;
-  ['为什么','如何','怎么看','是否应该','到底','背后','真相','原因','影响','意味着','对比','vs','排名','榜单','盘点','深度','解读','分析','趋势','未来','变化'].forEach(function(w){
+  var discuss = 30;
+  ['为什么','如何','怎么看','是否应该','到底','背后','真相','原因','影响','意味着','对比','vs','排名','榜单','盘点'].forEach(function(w){
     if (t.indexOf(w) !== -1) discuss += 10;
   });
   discuss += (topic.match(/？/g) || []).length * 8;
   discuss = Math.min(discuss, 100);
 
   // D3: 情绪共鸣度
-  var emotion = 35;
-  ['感动','泪目','暖心','治愈','惊喜','骄傲','自豪','致敬','逆袭','翻身','愤怒','震惊','恐怖','可怕','离谱','无语','崩溃','焦虑','内卷','躺平','炸了','沸腾','刷屏','破防','笑死','泪奔','心疼','燃爆','绝了','牛','网友','全民','所有人'].forEach(function(w){
-    if (t.indexOf(w) !== -1) emotion += 10;
+  var emotion = 25;
+  ['感动','泪目','暖心','治愈','惊喜','骄傲','自豪','致敬','逆袭','翻身','愤怒','震惊','恐怖','可怕','离谱','无语','崩溃','焦虑','内卷','躺平'].forEach(function(w){
+    if (t.indexOf(w) !== -1) emotion += 12;
   });
   emotion = Math.min(emotion, 100);
 
   // D4: 争议性
-  var controversy = 25;
-  ['禁','封','取消','抵制','道歉','翻车','翻脸','撕破','对立','歧视','不公平','双标','反转','打脸','下架','处罚','调查'].forEach(function(w){
-    if (t.indexOf(w) !== -1) controversy += 12;
+  var controversy = 20;
+  ['禁','封','取消','抵制','道歉','翻车','翻脸','撕破','对立','歧视','不公平','双标','反转','打脸'].forEach(function(w){
+    if (t.indexOf(w) !== -1) controversy += 15;
   });
   controversy = Math.min(controversy, 100);
 
   // D5: 实用价值
-  var practical = 35;
-  ['教程','攻略','方法','技巧','指南','推荐','测评','对比','清单','模板','工具','效率','省钱','赚钱','副业','必看','必备','神器','干货','福利'].forEach(function(w){
+  var practical = 30;
+  ['教程','攻略','方法','技巧','指南','推荐','测评','对比','清单','模板','工具','效率','省钱','赚钱','副业'].forEach(function(w){
     if (t.indexOf(w) !== -1) practical += 10;
   });
   practical = Math.min(practical, 100);
 
   // D6: 传播潜力
-  var viral = 35;
-  ['必看','千万别','终于','竟然','居然','没想到','万万没','谁敢','只有我才','99%的人','曝光','揭秘','首次公开','内部','内幕','独家'].forEach(function(w){
-    if (t.indexOf(w) !== -1) viral += 10;
+  var viral = 25;
+  ['必看','千万别','终于','竟然','居然','没想到','万万没','谁敢','只有我才','99%的人'].forEach(function(w){
+    if (t.indexOf(w) !== -1) viral += 12;
   });
-  if (/[A-Z]{2,}|明星|网红|博主|官方|央视|人民日报/.test(topic)) viral += 12;
+  if (/[A-Z]{2,}|明星|网红|博主|官方|央视|人民日报/.test(topic)) viral += 15;
   viral = Math.min(viral, 100);
 
   // Platform-specific weights
@@ -575,7 +532,7 @@ function calcScore(topic, platform, contentType) {
   if (platform.indexOf('知乎') !== -1) w = {t:0.15,d:0.3,e:0.1,c:0.15,p:0.2,v:0.1};
   if (platform.indexOf('微博') !== -1) w = {t:0.3,d:0.2,e:0.2,c:0.15,p:0.05,v:0.1};
 
-  var total = Math.round(timeliness*w.t + discuss*w.d + emotion*w.e + controversy*w.c + practical*w.p + viral*w.v);
+  var total = Math.round(timeliness*w.t + discuss*w.d + emotion*e + controversy*c + practical*p + viral*v);
 
   return {
     total: total,
@@ -648,6 +605,53 @@ function generateRiskWarning(topic, platform) {
 function controversyCheck(topic) {
   return ['禁','封','抵制','道歉','翻车','对立','歧视','双标','反转'].some(function(w){return topic.indexOf(w)!==-1;});
 }
-</script>
-</body>
-</html>
+</script>'''
+
+new_html_parts.append(js_code)
+new_html_parts.append('\n</body>\n</html>')
+
+# Write final file
+final_html = ''.join(new_html_parts)
+
+with open(r'C:\Users\VRPC01\.qclaw\workspace\hotpulse\index.html', 'w', encoding='utf-8') as f:
+    f.write(final_html)
+
+print(f'\n✅ File written: {len(final_html)} bytes')
+
+# Verify with Node.js
+verify_js = '''
+const fs=require("fs");
+const h=fs.readFileSync("index.html","utf8");
+var ok=true;
+var checks=[
+  ["</html>","HTML close"],
+  ["</script>","Script close"],
+  ["</body>","Body close"],
+  ['id="panel-hot"',"panel-hot"],
+  ['id="panel-analyze"',"panel-analyze"],
+  ['id="panel-content"',"panel-content"],
+  ['id="panel-history"',"panel-history"],
+  ["switchTab","switchTab fn"],
+  ["runAnalyze","runAnalyze fn"],
+  ["calcScore","calcScore fn"],
+  ["hotlist-merged","hotlist-merged"],
+  ["选题热度分析","analyze title"],
+  ["爆款参考案例","content title"],
+  ["analyze-input-area","analyze form"],
+  ["content-grid","content cards"],
+  ["btn-analyze","analyze button"]
+];
+checks.forEach(function(c){
+  var pass=h.indexOf(c[0])!==-1;
+  if(!pass)ok=false;
+  console.log((pass?"✅":"❌")+" "+c[1]);
+});
+console.log(ok?"\\n🎉 ALL CHECKS PASSED!":"\\n⚠️ SOME CHECKS FAILED");
+'''
+
+with open(r'C:\Users\VRPC01\.qclaw\workspace\hotpulse\_verify.js', 'w', encoding='utf-8') as f:
+    f.write(verify_js)
+
+result = subprocess.run(['node', '_verify.js'], capture_output=True, text=True, cwd=r'C:\Users\VRPC01\.qclaw\workspace\hotpulse')
+print(result.stdout)
+if result.stderr: print('STDERR:', result.stderr)
