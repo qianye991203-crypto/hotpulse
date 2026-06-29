@@ -1,0 +1,10 @@
+SOP system v1.0
+
+包含：
+- docs/运维SOP.md - 完整标准操作规程
+- scripts/backup.js - 自动备份脚本
+- scripts/verify.js - 验证脚本（8项检查）
+- scripts/rollback.js - 回滚脚本
+- scripts/run_update.js - 主更新脚本（SOP执行器）
+- backup/ - 自动备份目录（保留30天）
+- logs/ - 执行日志
